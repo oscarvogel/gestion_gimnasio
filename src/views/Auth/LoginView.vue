@@ -1,29 +1,17 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center px-4 py-8">
+  <div class="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-8">
     <div class="max-w-md w-full">
       <!-- Card principal -->
-      <div class="bg-white rounded-2xl shadow-xl p-8">
+      <div class="bg-white rounded-2xl shadow-xl p-10">
         <!-- Logo y título -->
         <div class="text-center mb-8">
-          <div class="mx-auto h-16 w-16 bg-primary-600 rounded-full flex items-center justify-center mb-4">
-            <svg 
-              class="h-10 w-10 text-white" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path 
-                stroke-linecap="round" 
-                stroke-linejoin="round" 
-                stroke-width="2" 
-                d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"
-              />
-            </svg>
+          <div class="mx-auto h-20 w-20 bg-emerald-50 rounded-2xl flex items-center justify-center mb-4">
+            <Dumbbell class="h-10 w-10 text-emerald-600" />
           </div>
           <h1 class="text-3xl font-bold text-gray-900 mb-2">
             Gestión Gimnasio
           </h1>
-          <p class="text-gray-600">
+          <p class="text-gray-500">
             Inicia sesión para continuar
           </p>
         </div>
@@ -31,28 +19,36 @@
         <!-- Formulario de login -->
         <form @submit.prevent="handleLogin" class="space-y-5">
           <!-- Email -->
-          <BaseInput
-            v-model="email"
-            type="email"
-            label="Email"
-            placeholder="tu@email.com"
-            autocomplete="email"
-            required
-            :error="emailError"
-            @focus="clearErrors"
-          />
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <input
+              v-model="email"
+              type="email"
+              placeholder="tu@email.com"
+              autocomplete="email"
+              required
+              @focus="clearErrors"
+              class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+              :class="{ 'border-red-300 focus:ring-red-500': emailError }"
+            />
+            <p v-if="emailError" class="mt-1 text-sm text-red-600">{{ emailError }}</p>
+          </div>
 
           <!-- Contraseña -->
-          <BaseInput
-            v-model="password"
-            type="password"
-            label="Contraseña"
-            placeholder="••••••••"
-            autocomplete="current-password"
-            required
-            :error="passwordError"
-            @focus="clearErrors"
-          />
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+            <input
+              v-model="password"
+              type="password"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              required
+              @focus="clearErrors"
+              class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+              :class="{ 'border-red-300 focus:ring-red-500': passwordError }"
+            />
+            <p v-if="passwordError" class="mt-1 text-sm text-red-600">{{ passwordError }}</p>
+          </div>
 
           <!-- Error general -->
           <div 
@@ -63,32 +59,31 @@
           </div>
 
           <!-- Botón de submit -->
-          <BaseButton
+          <button
             type="submit"
-            variant="primary"
-            size="lg"
-            full-width
-            :loading="userStore.loading"
-            :disabled="!isFormValid"
+            :disabled="!isFormValid || userStore.loading"
+            class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Iniciar Sesión
-          </BaseButton>
+            <span v-if="!userStore.loading">Iniciar Sesión</span>
+            <span v-else class="flex items-center justify-center">
+              <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Ingresando...
+            </span>
+          </button>
         </form>
 
         <!-- Footer -->
-        <div class="mt-6 text-center text-sm text-gray-600">
+        <div class="mt-6 text-center text-sm text-gray-500">
           <p>
             ¿Olvidaste tu contraseña?
-            <a href="#" class="text-primary-600 hover:text-primary-700 font-medium">
+            <a href="#" class="text-emerald-600 hover:text-emerald-700 font-medium">
               Recuperar
             </a>
           </p>
         </div>
-      </div>
-
-      <!-- Info adicional -->
-      <div class="mt-4 text-center text-sm text-gray-600">
-        <p>Sistema de Gestión para Gimnasios</p>
       </div>
     </div>
   </div>
@@ -98,8 +93,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
-import BaseInput from '@/components/ui/BaseInput.vue'
-import BaseButton from '@/components/ui/BaseButton.vue'
+import { Dumbbell } from 'lucide-vue-next'
 
 const router = useRouter()
 const userStore = useUserStore()

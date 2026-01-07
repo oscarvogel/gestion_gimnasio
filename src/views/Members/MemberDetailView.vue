@@ -22,15 +22,15 @@
       </div>
 
       <!-- Contenido -->
-      <div v-else-if="currentMember" class="space-y-6">
+      <div v-else-if="memberData" class="space-y-6">
         <!-- Header con nombre y botón editar -->
         <div class="bg-white rounded-lg shadow p-6">
           <div class="flex justify-between items-start">
             <div>
               <h1 class="text-3xl font-bold text-gray-900 mb-2">
-                {{ currentMember.nombre }} {{ currentMember.apellido }}
+                {{ memberData.nombre }} {{ memberData.apellido }}
               </h1>
-              <p class="text-gray-600">DNI: {{ currentMember.dni }}</p>
+              <p class="text-gray-600">DNI: {{ memberData.dni }}</p>
             </div>
             <BaseButton
               variant="primary"
@@ -47,18 +47,18 @@
           <div 
             :class="[
               'rounded-lg shadow p-6',
-              memberStatus.cuotaVencida ? 'bg-red-50 border-2 border-red-200' : 'bg-green-50 border-2 border-green-200'
+              memberData.estado_cuota === 'vencido' ? 'bg-red-50 border-2 border-red-200' : 'bg-green-50 border-2 border-green-200'
             ]"
           >
             <div class="flex items-center justify-between mb-4">
               <h3 class="text-lg font-semibold text-gray-900">Estado de Cuota</h3>
               <StatusBadge
-                :status="memberStatus.cuotaVencida ? 'vencido' : 'activo'"
-                :label="memberStatus.cuotaVencida ? 'Vencida' : 'Al día'"
+                :status="memberData.estado_cuota"
+                :label="memberData.estado_cuota === 'activo' ? 'Al día' : 'Vencido'"
               />
             </div>
-            <p :class="memberStatus.cuotaVencida ? 'text-red-700' : 'text-green-700'">
-              {{ memberStatus.cuotaMessage }}
+            <p :class="memberData.estado_cuota === 'vencido' ? 'text-red-700' : 'text-green-700'">
+              {{ memberData.estado_cuota === 'activo' ? 'El socio está al día con sus pagos' : 'El socio tiene la cuota vencida' }}
             </p>
           </div>
 
@@ -66,18 +66,23 @@
           <div 
             :class="[
               'rounded-lg shadow p-6',
-              memberStatus.aptoVencido ? 'bg-yellow-50 border-2 border-yellow-200' : 'bg-blue-50 border-2 border-blue-200'
+              memberData.estado_apto_fisico === 'vencido' ? 'bg-yellow-50 border-2 border-yellow-200' : 'bg-blue-50 border-2 border-blue-200'
             ]"
           >
             <div class="flex items-center justify-between mb-4">
               <h3 class="text-lg font-semibold text-gray-900">Apto Físico</h3>
               <StatusBadge
-                :status="memberStatus.aptoVencido ? 'vencido_apto' : 'vigente'"
-                :label="memberStatus.aptoVencido ? 'Vencido' : 'Vigente'"
+                :status="memberData.estado_apto_fisico === 'vigente' ? 'vigente' : 'vencido_apto'"
+                :label="memberData.estado_apto_fisico === 'vigente' ? 'Vigente' : 'Vencido'"
               />
             </div>
-            <p :class="memberStatus.aptoVencido ? 'text-yellow-700' : 'text-blue-700'">
-              {{ memberStatus.aptoMessage }}
+            <p :class="memberData.estado_apto_fisico === 'vencido' ? 'text-yellow-700' : 'text-blue-700'">
+              {{ memberData.apto_fisico ? 
+                (memberData.estado_apto_fisico === 'vigente' ? 
+                  `Apto físico vigente hasta el ${formatDate(memberData.apto_fisico)}` : 
+                  `Apto físico vencido el ${formatDate(memberData.apto_fisico)}`) 
+                : 'No tiene apto físico registrado' 
+              }}
             </p>
           </div>
         </div>
@@ -89,21 +94,21 @@
             <div>
               <dt class="text-sm font-medium text-gray-500">Fecha de Nacimiento</dt>
               <dd class="mt-1 text-sm text-gray-900">
-                {{ formatDate(currentMember.fecha_nacimiento) || '-' }}
+                {{ formatDate(memberData.fecha_nacimiento) || '-' }}
               </dd>
             </div>
             <div>
               <dt class="text-sm font-medium text-gray-500">Email</dt>
-              <dd class="mt-1 text-sm text-gray-900">{{ currentMember.email || '-' }}</dd>
+              <dd class="mt-1 text-sm text-gray-900">{{ memberData.email || '-' }}</dd>
             </div>
             <div>
               <dt class="text-sm font-medium text-gray-500">Teléfono</dt>
-              <dd class="mt-1 text-sm text-gray-900">{{ currentMember.telefono || '-' }}</dd>
+              <dd class="mt-1 text-sm text-gray-900">{{ memberData.telefono || '-' }}</dd>
             </div>
             <div>
               <dt class="text-sm font-medium text-gray-500">Fecha de Alta</dt>
               <dd class="mt-1 text-sm text-gray-900">
-                {{ formatDate(currentMember.created_at) }}
+                {{ formatDate(memberData.created_at) }}
               </dd>
             </div>
           </dl>
@@ -123,46 +128,54 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useMembers } from '@/composables/useMembers'
+import { supabase } from '@/lib/supabase'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 
 const router = useRouter()
 const route = useRoute()
-const { currentMember, loading, error, getMemberById } = useMembers()
 
-const memberStatus = computed(() => {
-  if (!currentMember.value) return {}
+const memberData = ref(null)
+const loading = ref(false)
+const error = ref(null)
 
-  const today = new Date()
-  
-  // Calcular estado de cuota (simplificado, ajusta según tu lógica)
-  const cuotaVencida = true // TODO: Calcular basándote en último pago
-  const cuotaMessage = cuotaVencida 
-    ? 'El socio tiene la cuota vencida' 
-    : 'El socio está al día con sus pagos'
+async function getMemberWithStatus(id) {
+  try {
+    loading.value = true
+    error.value = null
 
-  // Calcular estado de apto físico
-  let aptoVencido = false
-  let aptoMessage = 'No tiene apto físico registrado'
-  
-  if (currentMember.value.apto_fisico) {
-    const aptoDate = new Date(currentMember.value.apto_fisico)
-    aptoVencido = aptoDate < today
-    aptoMessage = aptoVencido
-      ? `Apto físico vencido el ${formatDate(currentMember.value.apto_fisico)}`
-      : `Apto físico vigente hasta el ${formatDate(currentMember.value.apto_fisico)}`
+    // Consultar los datos personales desde la tabla members
+    const { data: personalData, error: memberError } = await supabase
+      .from('members')
+      .select('id, dni, nombre, apellido, email, telefono, fecha_nacimiento, apto_fisico, created_at')
+      .eq('id', id)
+      .single()
+
+    if (memberError) throw memberError
+
+    // Consultar el estado calculado desde v_socios_estado (fuente de verdad)
+    const { data: statusData, error: statusError } = await supabase
+      .from('v_socios_estado')
+      .select('estado_cuota, estado_apto_fisico')
+      .eq('id', id)
+      .single()
+
+    if (statusError) throw statusError
+
+    // Combinar ambos resultados
+    memberData.value = {
+      ...personalData,
+      ...statusData
+    }
+  } catch (err) {
+    console.error('Error al obtener socio:', err)
+    error.value = err.message
+  } finally {
+    loading.value = false
   }
-
-  return {
-    cuotaVencida,
-    cuotaMessage,
-    aptoVencido,
-    aptoMessage
-  }
-})
+}
 
 function formatDate(dateString) {
   if (!dateString) return ''
@@ -179,6 +192,6 @@ function goToEdit() {
 }
 
 onMounted(async () => {
-  await getMemberById(route.params.id)
+  await getMemberWithStatus(route.params.id)
 })
 </script>

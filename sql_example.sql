@@ -1,0 +1,54 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.attendance (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  created_at timestamp with time zone DEFAULT now(),
+  member_id uuid,
+  acceso_permitido boolean DEFAULT true,
+  CONSTRAINT attendance_pkey PRIMARY KEY (id),
+  CONSTRAINT attendance_member_id_fkey FOREIGN KEY (member_id) REFERENCES public.members(id)
+);
+CREATE TABLE public.members (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  created_at timestamp with time zone DEFAULT now(),
+  nombre text NOT NULL,
+  apellido text NOT NULL,
+  dni text NOT NULL UNIQUE,
+  email text,
+  telefono text,
+  fecha_nacimiento date,
+  apto_fisico date,
+  foto_url text,
+  notas text,
+  CONSTRAINT members_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.payments (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  created_at timestamp with time zone DEFAULT now(),
+  member_id uuid,
+  plan_id integer,
+  monto numeric NOT NULL,
+  metodo_pago text NOT NULL,
+  fecha_inicio date NOT NULL,
+  fecha_fin date NOT NULL,
+  CONSTRAINT payments_pkey PRIMARY KEY (id),
+  CONSTRAINT payments_member_id_fkey FOREIGN KEY (member_id) REFERENCES public.members(id),
+  CONSTRAINT payments_plan_id_fkey FOREIGN KEY (plan_id) REFERENCES public.plans(id)
+);
+CREATE TABLE public.plans (
+  id integer NOT NULL DEFAULT nextval('plans_id_seq'::regclass),
+  nombre text NOT NULL,
+  precio numeric NOT NULL,
+  dias_duracion integer NOT NULL,
+  activo boolean DEFAULT true,
+  CONSTRAINT plans_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.staff (
+  id uuid NOT NULL,
+  email text,
+  rol text DEFAULT 'admin'::text,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT staff_pkey PRIMARY KEY (id),
+  CONSTRAINT staff_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id)
+);

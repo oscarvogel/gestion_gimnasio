@@ -1,10 +1,10 @@
 <template>
-  <div class="bg-gray-50">
+  <div class="bg-gray-50 min-h-screen">
     <div class="max-w-7xl mx-auto px-4 py-8">
       <!-- Header -->
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-        <p class="text-gray-600">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Dashboard</h1>
+        <p class="text-gray-400">
           Bienvenido, {{ userStore.userEmail }}
           <span v-if="userStore.isAdmin" class="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded">
             Admin
@@ -20,104 +20,136 @@
         <p class="text-gray-600">Cargando estadísticas...</p>
       </div>
 
-      <!-- Tarjetas de estadísticas -->
-      <div v-else class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        <!-- Total Socios -->
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-          <div class="p-5">
-            <div class="flex items-center">
-              <div class="ml-5 w-0 flex-1">
-                <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Total Socios</dt>
-                  <dd class="text-3xl font-semibold text-gray-900">{{ stats.totalMembers }}</dd>
-                </dl>
-              </div>
+      <div v-else>
+        <!-- Tarjetas de Métricas -->
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+          <StatCard
+            title="Ingresos del Mes"
+            :value="'$' + formatCurrency(stats.monthlyRevenue)"
+            trend="+12%"
+            :icon="Wallet"
+            route="/analytics?tab=revenue"
+            icon-bg-color="bg-emerald-50"
+            icon-color="text-emerald-600"
+          />
+          
+          <StatCard
+            title="Socios Activos"
+            :value="stats.activeMembers"
+            trend="+8%"
+            :icon="Users"
+            route="/analytics?tab=members"
+            icon-bg-color="bg-blue-50"
+            icon-color="text-blue-600"
+          />
+          
+          <StatCard
+            title="Asistencia Hoy"
+            :value="stats.todayAttendance"
+            trend="+5%"
+            :icon="Activity"
+            route="/analytics?tab=attendance"
+            icon-bg-color="bg-purple-50"
+            icon-color="text-purple-600"
+          />
+          
+          <StatCard
+            title="Socios Vencidos"
+            :value="stats.expiredMembers"
+            trend="-3%"
+            :icon="AlertCircle"
+            route="/miembros"
+            icon-bg-color="bg-red-50"
+            icon-color="text-red-600"
+          />
+        </div>
+
+        <!-- Gráficos -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <!-- Gráfico de Ingresos (2/3) -->
+          <div class="lg:col-span-2 bg-white rounded-xl shadow-sm p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Ingresos Mensuales</h3>
+            <RevenueChart />
+          </div>
+
+          <!-- Gráfico de Asistencia (1/3) -->
+          <div class="bg-white rounded-xl shadow-sm p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Asistencia Semanal</h3>
+            <AssistanceChart />
+          </div>
+        </div>
+
+        <!-- Últimos Check-Ins -->
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-bold text-gray-800">Últimos Check-Ins</h2>
+            <BaseButton
+              variant="ghost"
+              @click="router.push('/checkin')"
+              size="sm"
+            >
+              Ver todos
+            </BaseButton>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-gray-100">
+                  <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Socio</th>
+                  <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">DNI</th>
+                  <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Hora</th>
+                  <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr 
+                  v-for="checkin in recentCheckIns" 
+                  :key="checkin.id"
+                  class="border-b border-gray-50 hover:bg-gray-50 transition-colors"
+                >
+                  <td class="py-3 px-4 text-sm text-gray-800">{{ checkin.name }}</td>
+                  <td class="py-3 px-4 text-sm text-gray-500">{{ checkin.dni }}</td>
+                  <td class="py-3 px-4 text-sm text-gray-500">{{ checkin.time }}</td>
+                  <td class="py-3 px-4">
+                    <StatusBadge
+                      :status="checkin.status"
+                      :label="checkin.statusLabel"
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div v-if="recentCheckIns.length === 0" class="text-center py-8 text-gray-400">
+              No hay check-ins recientes
             </div>
           </div>
         </div>
 
-        <!-- Socios Activos -->
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-          <div class="p-5">
-            <div class="flex items-center">
-              <div class="ml-5 w-0 flex-1">
-                <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Al Día</dt>
-                  <dd class="text-3xl font-semibold text-green-600">{{ stats.activeMembers }}</dd>
-                </dl>
-              </div>
-            </div>
+        <!-- Accesos Rápidos -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mt-6">
+          <h2 class="text-xl font-bold text-gray-800 mb-4">Accesos Rápidos</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <BaseButton
+              variant="primary"
+              @click="router.push({ name: 'CheckIn' })"
+            >
+              Check-In
+            </BaseButton>
+            <BaseButton
+              variant="primary"
+              @click="router.push({ name: 'NewPayment' })"
+            >
+              Nuevo Pago
+            </BaseButton>
+            <BaseButton
+              variant="primary"
+              @click="router.push({ name: 'NewMember' })"
+            >
+              Nuevo Socio
+            </BaseButton>
           </div>
-        </div>
-
-        <!-- Socios Vencidos -->
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-          <div class="p-5">
-            <div class="flex items-center">
-              <div class="ml-5 w-0 flex-1">
-                <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Vencidos</dt>
-                  <dd class="text-3xl font-semibold text-red-600">{{ stats.expiredMembers }}</dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Asistencia Hoy -->
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-          <div class="p-5">
-            <div class="flex items-center">
-              <div class="ml-5 w-0 flex-1">
-                <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Asistencia Hoy</dt>
-                  <dd class="text-3xl font-semibold text-blue-600">{{ stats.todayAttendance }}</dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Ingresos del Mes -->
-      <div class="bg-white overflow-hidden shadow rounded-lg mb-8">
-        <div class="p-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <h3 class="text-lg font-medium text-gray-900">Ingresos del Mes</h3>
-              <p class="text-3xl font-bold text-green-600 mt-2">
-                ${{ formatCurrency(stats.monthlyRevenue) }}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Accesos Rápidos -->
-      <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-4">Accesos Rápidos</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <BaseButton
-            variant="primary"
-            full-width
-            @click="router.push({ name: 'CheckIn' })"
-          >
-            Check-In
-          </BaseButton>
-          <BaseButton
-            variant="primary"
-            full-width
-            @click="router.push({ name: 'NewPayment' })"
-          >
-            Nuevo Pago
-          </BaseButton>
-          <BaseButton
-            variant="primary"
-            full-width
-            @click="router.push({ name: 'NewMember' })"
-          >
-            Nuevo Socio
-          </BaseButton>
         </div>
       </div>
     </div>
@@ -125,24 +157,46 @@
 </template>
 
 <script setup>
-import { onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { useGymStore } from '@/stores/gymStore'
+import { Wallet, Users, Activity, AlertCircle } from 'lucide-vue-next'
+import StatCard from '@/components/dashboard/StatCard.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
+import StatusBadge from '@/components/ui/StatusBadge.vue'
+import AssistanceChart from '@/components/charts/AssistanceChart.vue'
+import RevenueChart from '@/components/charts/RevenueChart.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
 const gymStore = useGymStore()
 
-const stats = computed(() => gymStore.stats)
-const loading = computed(() => gymStore.loading)
+const loading = ref(false)
+const stats = ref({
+  totalMembers: 0,
+  activeMembers: 0,
+  expiredMembers: 0,
+  todayAttendance: 0,
+  monthlyRevenue: 0
+})
+
+// Mock data para últimos check-ins
+const recentCheckIns = ref([
+  { id: 1, name: 'Juan Pérez', dni: '12345678', time: '14:30', status: 'activo', statusLabel: 'Al día' },
+  { id: 2, name: 'María García', dni: '87654321', time: '14:15', status: 'activo', statusLabel: 'Al día' },
+  { id: 3, name: 'Carlos López', dni: '11223344', time: '14:00', status: 'vencido', statusLabel: 'Vencido' }
+])
+
+onMounted(async () => {
+  loading.value = true
+  await gymStore.getStats()
+  stats.value = gymStore.stats
+  loading.value = false
+})
 
 function formatCurrency(value) {
-  return new Intl.NumberFormat('es-AR', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(value || 0)
+  return value.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 }
 
 onMounted(async () => {

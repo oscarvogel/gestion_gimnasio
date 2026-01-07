@@ -1,113 +1,201 @@
 <template>
-  <div class="bg-gray-50">
-    <div class="max-w-4xl mx-auto px-4 py-8">
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Check-In</h1>
-        <p class="text-gray-600">Registra el ingreso de los socios al gimnasio</p>
-      </div>
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div class="h-screen flex flex-col lg:flex-row">
+      
+      <!-- Área Principal: Kiosco de Acceso -->
+      <div class="flex-1 flex flex-col items-center justify-center p-6">
+        
+        <!-- Icono Decorativo + Header -->
+        <div class="mb-8 text-center">
+          <div class="mb-6 flex justify-center">
+            <CreditCard class="w-16 h-16 text-gray-200" />
+          </div>
+          <h1 class="text-4xl font-bold text-gray-900 mb-2">Acceso al Gimnasio</h1>
+          <p class="text-gray-600 text-lg">Escanea o ingresa tu DNI</p>
+        </div>
 
-      <!-- Buscador -->
-      <div class="bg-white rounded-lg shadow p-6 mb-6">
-        <BaseInput
-          v-model="searchQuery"
-          type="text"
-          label="Buscar Socio"
-          placeholder="Nombre, apellido o DNI..."
-          @input="searchMembers"
-        />
-      </div>
+        <!-- Buscador Gigante Centrado -->
+        <div class="w-full max-w-2xl mb-8">
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Ingresa DNI, nombre o apellido..."
+            class="w-full text-2xl p-6 rounded-2xl border-2 border-gray-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 focus:outline-none shadow-lg transition-all"
+            @input="searchMembers"
+            autofocus
+          />
+        </div>
 
-      <!-- Loading -->
-      <div v-if="loading" class="bg-white rounded-lg shadow p-8 text-center">
-        <p class="text-gray-600">Buscando...</p>
-      </div>
+        <!-- Loading -->
+        <div v-if="loading" class="text-center">
+          <div class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-emerald-500 border-r-transparent"></div>
+          <p class="text-gray-600 mt-4 text-lg">Buscando...</p>
+        </div>
 
-      <!-- Resultados de búsqueda -->
-      <div v-else-if="searchResults.length > 0" class="bg-white rounded-lg shadow overflow-hidden mb-6">
-        <div class="divide-y divide-gray-200">
+        <!-- Resultados: Tarjetas de Acceso -->
+        <div v-else-if="searchResults.length > 0" class="w-full max-w-2xl space-y-4">
           <div
             v-for="member in searchResults"
             :key="member.id"
-            class="p-4 hover:bg-gray-50 transition-colors"
+            @click="handleCheckIn(member)"
+            class="cursor-pointer transform transition-transform hover:scale-[1.02]"
           >
-            <div class="flex items-center justify-between">
-              <div class="flex-1">
-                <h3 class="text-lg font-medium text-gray-900">
-                  {{ member.nombre }} {{ member.apellido }}
-                </h3>
-                <p class="text-sm text-gray-500">DNI: {{ member.dni }}</p>
-                <div class="flex gap-2 mt-2">
-                  <StatusBadge
-                    :status="member.estado_cuota"
-                    :label="member.estado_cuota === 'activo' ? 'Al día' : 'Vencido'"
-                  />
-                  <StatusBadge
-                    :status="member.estado_apto_fisico === 'vigente' ? 'vigente' : 'vencido_apto'"
-                    :label="member.estado_apto_fisico === 'vigente' ? 'Apto OK' : 'Apto Vencido'"
-                  />
+            <!-- ACCESO PERMITIDO -->
+            <div
+              v-if="canCheckIn(member)"
+              class="bg-gradient-to-r from-emerald-50 to-teal-50 border-4 border-emerald-500 rounded-3xl p-8 shadow-2xl"
+            >
+              <div class="flex items-center gap-6">
+                <!-- Avatar Grande -->
+                <div class="h-24 w-24 rounded-full bg-emerald-500 text-white flex items-center justify-center text-3xl font-bold flex-shrink-0 shadow-lg">
+                  {{ getInitials(member.nombre, member.apellido) }}
+                </div>
+                
+                <!-- Info -->
+                <div class="flex-1">
+                  <p class="text-3xl font-bold text-gray-900 mb-1">
+                    {{ member.nombre }} {{ member.apellido }}
+                  </p>
+                  <p class="text-lg text-gray-600 mb-4">DNI: {{ member.dni }}</p>
+                  <div class="flex items-center gap-3 bg-white rounded-xl px-4 py-3 shadow-sm">
+                    <CheckCircle class="h-8 w-8 text-emerald-500" />
+                    <span class="text-2xl font-bold text-emerald-600">ACCESO PERMITIDO</span>
+                  </div>
                 </div>
               </div>
-              <BaseButton
-                :variant="canCheckIn(member) ? 'primary' : 'danger'"
-                @click="handleCheckIn(member)"
-              >
-                {{ canCheckIn(member) ? 'Check-In' : 'Registrar' }}
-              </BaseButton>
+            </div>
+
+            <!-- ACCESO DENEGADO -->
+            <div
+              v-else
+              class="bg-gradient-to-r from-red-50 to-orange-50 border-4 border-red-500 rounded-3xl p-8 shadow-2xl"
+            >
+              <div class="flex items-center gap-6">
+                <!-- Avatar Grande -->
+                <div class="h-24 w-24 rounded-full bg-red-500 text-white flex items-center justify-center text-3xl font-bold flex-shrink-0 shadow-lg">
+                  {{ getInitials(member.nombre, member.apellido) }}
+                </div>
+                
+                <!-- Info -->
+                <div class="flex-1">
+                  <p class="text-3xl font-bold text-gray-900 mb-1">
+                    {{ member.nombre }} {{ member.apellido }}
+                  </p>
+                  <p class="text-lg text-gray-600 mb-4">DNI: {{ member.dni }}</p>
+                  <div class="flex items-center gap-3 bg-white rounded-xl px-4 py-3 shadow-sm">
+                    <AlertCircle class="h-8 w-8 text-red-500" />
+                    <div class="flex-1">
+                      <span class="text-2xl font-bold text-red-600 block">ACCESO DENEGADO</span>
+                      <span class="text-base text-red-500 font-medium">
+                        {{ member.estado_cuota !== 'activo' ? 'Cuota Vencida' : 'Apto Físico Vencido' }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
+        <!-- Sin resultados -->
+        <div v-else-if="searchQuery && !loading" class="text-center text-gray-500 text-xl">
+          <AlertCircle class="h-16 w-16 mx-auto mb-4 text-gray-400" />
+          <p>No se encontraron resultados</p>
+        </div>
+
+        <!-- Mensaje Inicial -->
+        <div v-else class="text-center text-gray-400 text-xl max-w-md">
+          <p>Comienza escribiendo el DNI, nombre o apellido del socio</p>
+        </div>
       </div>
 
-      <!-- Sin resultados -->
-      <div v-else-if="searchQuery && !loading" class="bg-white rounded-lg shadow p-8 text-center">
-        <p class="text-gray-600">No se encontraron socios</p>
-      </div>
-
-      <!-- Últimos Check-Ins -->
-      <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-4">Últimos Check-Ins</h2>
+      <!-- Aside Lateral: Live Feed de Últimos Accesos -->
+      <aside class="lg:w-80 bg-white lg:border-l border-gray-200 lg:overflow-y-auto">
+        <div class="sticky top-0 bg-white border-b border-gray-100 p-6 z-10">
+          <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+            <Activity class="h-5 w-5 text-emerald-600" />
+            Últimos Accesos
+          </h2>
+          <p class="text-xs text-gray-500 mt-1">Live Feed</p>
+        </div>
         
-        <div v-if="recentCheckIns.length > 0" class="divide-y divide-gray-200">
+        <div v-if="recentCheckIns.length > 0" class="divide-y divide-gray-50">
           <div
             v-for="checkIn in recentCheckIns"
             :key="checkIn.id"
-            class="py-3 flex justify-between items-center"
+            class="p-4 hover:bg-gray-50 transition-colors"
           >
-            <div>
-              <p class="text-sm font-medium text-gray-900">{{ checkIn.member_name }}</p>
-              <p class="text-xs text-gray-500">{{ formatTime(checkIn.created_at) }}</p>
+            <div class="flex items-center gap-3">
+              <!-- Avatar circular -->
+              <div class="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-semibold text-gray-600 flex-shrink-0">
+                {{ getInitials(checkIn.member_name.split(' ')[0], checkIn.member_name.split(' ')[1]) }}
+              </div>
+              
+              <!-- Info -->
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2">
+                  <!-- Indicador Visual (punto) -->
+                  <div :class="[
+                    'h-2 w-2 rounded-full flex-shrink-0',
+                    checkIn.acceso_permitido ? 'bg-emerald-500' : 'bg-red-500'
+                  ]"></div>
+                  <p class="text-sm font-medium text-gray-900 truncate">
+                    {{ checkIn.member_name }}
+                  </p>
+                </div>
+                <p class="text-xs text-gray-400 mt-0.5 ml-4">
+                  {{ formatTime(checkIn.created_at) }}
+                </p>
+              </div>
             </div>
-            <span :class="[
-              'px-2 py-1 text-xs rounded',
-              checkIn.acceso_permitido ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-            ]">
-              {{ checkIn.acceso_permitido ? 'Permitido' : 'Con observación' }}
-            </span>
           </div>
         </div>
         
-        <p v-else class="text-gray-500 text-center py-4">
-          No hay check-ins recientes
-        </p>
-      </div>
-
-      <!-- Modal de confirmación -->
-      <div v-if="showModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
-        <div class="bg-white p-8 rounded-lg shadow-xl max-w-md mx-4">
-          <h3 class="text-xl font-bold mb-4">
-            {{ modalData.allowed ? 'Check-In Exitoso' : 'Check-In con Observación' }}
-          </h3>
-          <p class="mb-6">
-            {{ modalData.message }}
-          </p>
-          <BaseButton
-            variant="primary"
-            full-width
-            @click="closeModal"
-          >
-            Cerrar
-          </BaseButton>
+        <div v-else class="p-8 text-center">
+          <Activity class="h-12 w-12 mx-auto mb-3 text-gray-300" />
+          <p class="text-gray-400 text-sm">Sin accesos recientes</p>
         </div>
+      </aside>
+    </div>
+
+    <!-- Modal de Confirmación Visual -->
+    <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+      <div 
+        :class="[
+          'rounded-3xl p-12 shadow-2xl max-w-lg w-full text-center transform transition-all',
+          modalData.allowed ? 'bg-emerald-50 border-4 border-emerald-500' : 'bg-red-50 border-4 border-red-500'
+        ]"
+      >
+        <!-- Icono -->
+        <div :class="[
+          'mx-auto h-24 w-24 rounded-full flex items-center justify-center mb-6',
+          modalData.allowed ? 'bg-emerald-500' : 'bg-red-500'
+        ]">
+          <CheckCircle v-if="modalData.allowed" class="h-16 w-16 text-white" />
+          <AlertCircle v-else class="h-16 w-16 text-white" />
+        </div>
+        
+        <!-- Texto -->
+        <h3 :class="[
+          'text-4xl font-bold mb-4',
+          modalData.allowed ? 'text-emerald-900' : 'text-red-900'
+        ]">
+          {{ modalData.allowed ? 'ACCESO PERMITIDO' : 'ACCESO DENEGADO' }}
+        </h3>
+        
+        <p class="text-lg text-gray-700 mb-8">
+          {{ modalData.message }}
+        </p>
+        
+        <button
+          @click="closeModal"
+          :class="[
+            'w-full py-4 px-6 rounded-xl text-white font-semibold text-lg transition-colors',
+            modalData.allowed ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-red-600 hover:bg-red-700'
+          ]"
+        >
+          Cerrar
+        </button>
       </div>
     </div>
   </div>
@@ -116,9 +204,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { supabase } from '@/lib/supabase'
-import BaseInput from '@/components/ui/BaseInput.vue'
-import BaseButton from '@/components/ui/BaseButton.vue'
-import StatusBadge from '@/components/ui/StatusBadge.vue'
+import { CheckCircle, AlertCircle, Activity, CreditCard } from 'lucide-vue-next'
 
 const searchQuery = ref('')
 const searchResults = ref([])
@@ -160,10 +246,49 @@ function canCheckIn(member) {
   return member.estado_cuota === 'activo' && member.estado_apto_fisico === 'vigente'
 }
 
+function getInitials(nombre, apellido) {
+  const firstInitial = nombre ? nombre.charAt(0).toUpperCase() : ''
+  const lastInitial = apellido ? apellido.charAt(0).toUpperCase() : ''
+  return firstInitial + lastInitial
+}
+
 async function handleCheckIn(member) {
   const allowed = canCheckIn(member)
   
   try {
+    // Verificar si ya existe un check-in hoy para este socio
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const todayISO = today.toISOString()
+    
+    const { data: existingCheckIn, error: checkError } = await supabase
+      .from('attendance')
+      .select('id, created_at')
+      .eq('member_id', member.id)
+      .gte('created_at', todayISO)
+      .limit(1)
+
+    if (checkError) throw checkError
+
+    // Si ya existe un check-in hoy, mostrar mensaje y no registrar
+    if (existingCheckIn && existingCheckIn.length > 0) {
+      const checkInTime = new Date(existingCheckIn[0].created_at).toLocaleTimeString('es-AR', {
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+      
+      modalData.value = {
+        allowed: false,
+        message: `${member.nombre} ${member.apellido} ya registró su acceso hoy a las ${checkInTime}.`
+      }
+      showModal.value = true
+      
+      // Limpiar búsqueda
+      searchQuery.value = ''
+      searchResults.value = []
+      return
+    }
+
     // Registrar asistencia
     const { error } = await supabase
       .from('attendance')

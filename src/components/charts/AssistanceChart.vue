@@ -1,14 +1,12 @@
 <template>
-  <div class="bg-white rounded-lg shadow p-6">
-    <h3 class="text-lg font-semibold text-gray-900 mb-4">Asistencia Semanal</h3>
-    
+  <div>
     <!-- Gráfico simple con barras CSS -->
     <div class="space-y-3">
       <div v-for="day in weekData" :key="day.day" class="flex items-center">
         <div class="w-20 text-sm text-gray-600">{{ day.day }}</div>
         <div class="flex-1 bg-gray-100 rounded-full h-8 relative">
           <div 
-            class="bg-primary-500 h-full rounded-full flex items-center justify-end pr-2"
+            class="bg-emerald-500 h-full rounded-full flex items-center justify-end pr-2"
             :style="{ width: `${(day.count / maxCount) * 100}%` }"
           >
             <span class="text-white text-xs font-medium">{{ day.count }}</span>

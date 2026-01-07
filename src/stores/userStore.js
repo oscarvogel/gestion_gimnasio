@@ -63,14 +63,28 @@ export const useUserStore = defineStore('user', () => {
         await checkUserRole(currentSession.user.id)
       }
 
-      // Escuchar cambios en la autenticación
-      supabase.auth.onAuthStateChange(async (_event, newSession) => {
+      // Escuchar cambios en la autenticación (incluyendo refresh de token)
+      supabase.auth.onAuthStateChange(async (event, newSession) => {
+        console.log('Auth state changed:', event)
+        
         session.value = newSession
         user.value = newSession?.user || null
         
         if (newSession?.user) {
           await checkUserRole(newSession.user.id)
         } else {
+          userRole.value = null
+        }
+
+        // Si el token se refrescó, actualizar la sesión
+        if (event === 'TOKEN_REFRESHED') {
+          console.log('Token refrescado automáticamente')
+        }
+        
+        // Si la sesión expiró, limpiar todo
+        if (event === 'SIGNED_OUT') {
+          session.value = null
+          user.value = null
           userRole.value = null
         }
       })
@@ -121,13 +135,12 @@ export const useUserStore = defineStore('user', () => {
       loading.value = true
       error.value = null
 
+      const { error: logoutError } = await supabase.auth.signOut()
+      if (logoutError) throw logoutError
 
       session.value = null
       user.value = null
-      userRoleRole.value = null
-
-      session.value = null
-      user.value = null
+      userRole.value = null
 
       return { success: true }
     } catch (err) {

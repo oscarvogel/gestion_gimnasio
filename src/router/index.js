@@ -31,6 +31,11 @@ const routes = [
         component: DashboardView
       },
       {
+        path: 'analytics',
+        name: 'Analytics',
+        component: () => import('@/views/Analytics/AnalyticsView.vue')
+      },
+      {
         path: 'miembros',
         name: 'Members',
         component: MembersListView
@@ -70,9 +75,22 @@ const router = createRouter({
 })
 
 // Guard de navegación global
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore()
   const requiresAuth = to.meta.requiresAuth
+
+  // Verificar sesión directamente con Supabase si el store está vacío
+  if (!userStore.session) {
+    const { supabase } = await import('@/lib/supabase')
+    const { data: { session } } = await supabase.auth.getSession()
+    
+    if (session) {
+      // Si Supabase tiene sesión pero el store no, actualizar el store
+      userStore.session = session
+      userStore.user = session.user
+      await userStore.checkUserRole(session.user.id)
+    }
+  }
 
   // Si la ruta requiere autenticación y no hay sesión, redirigir a login
   if (requiresAuth && !userStore.isAuthenticated) {

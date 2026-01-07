@@ -1,31 +1,37 @@
 <template>
-  <div class="bg-white rounded-lg shadow p-6">
-    <h3 class="text-lg font-semibold text-gray-900 mb-4">Ingresos Mensuales</h3>
-    
-    <!-- Gráfico simple con barras CSS -->
-    <div class="space-y-3">
-      <div v-for="month in monthsData" :key="month.month" class="flex items-center">
-        <div class="w-16 text-sm text-gray-600">{{ month.month }}</div>
-        <div class="flex-1 bg-gray-100 rounded-full h-8 relative">
-          <div 
-            class="bg-green-500 h-full rounded-full flex items-center justify-end pr-2"
-            :style="{ width: `${(month.amount / maxAmount) * 100}%` }"
-          >
-            <span class="text-white text-xs font-medium">${{ formatNumber(month.amount) }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="mt-4 text-sm text-gray-500 text-center">
-      Promedio mensual: ${{ formatNumber(averageRevenue) }}
-    </div>
+  <div style="height: 300px;">
+    <!-- Gráfico de línea con Chart.js -->
+    <Line :data="chartData" :options="chartOptions" />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { Line } from 'vue-chartjs'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js'
 import { supabase } from '@/lib/supabase'
+
+// Registrar componentes de Chart.js
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+)
 
 const monthsData = ref([
   { month: 'Ene', amount: 0 },
@@ -36,9 +42,93 @@ const monthsData = ref([
   { month: 'Jun', amount: 0 }
 ])
 
-const maxAmount = computed(() => {
-  return Math.max(...monthsData.value.map(d => d.amount), 1)
-})
+const chartData = computed(() => ({
+  labels: monthsData.value.map(m => m.month),
+  datasets: [
+    {
+      label: 'Ingresos',
+      data: monthsData.value.map(m => m.amount),
+      borderColor: '#10b981', // emerald-500
+      backgroundColor: 'rgba(16, 185, 129, 0.1)', // emerald-500 con transparencia
+      borderWidth: 3,
+      fill: true,
+      tension: 0.4, // Línea curva
+      pointRadius: 5,
+      pointBackgroundColor: '#10b981',
+      pointBorderColor: '#fff',
+      pointBorderWidth: 2,
+      pointHoverRadius: 7,
+      pointHoverBorderWidth: 3
+    }
+  ]
+}))
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: true,
+  aspectRatio: 2,
+  plugins: {
+    legend: {
+      display: false
+    },
+    tooltip: {
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      padding: 12,
+      borderRadius: 8,
+      displayColors: false,
+      titleFont: {
+        size: 14
+      },
+      bodyFont: {
+        size: 13
+      },
+      callbacks: {
+        label: (context) => {
+          return `$${context.parsed.y.toLocaleString('es-AR')}`
+        }
+      }
+    }
+  },
+  scales: {
+    x: {
+      grid: {
+        display: false // Sin líneas de cuadrícula en X
+      },
+      ticks: {
+        font: {
+          size: 12
+        },
+        color: '#6b7280' // gray-500
+      },
+      border: {
+        display: false
+      }
+    },
+    y: {
+      grid: {
+        display: false // Sin líneas de cuadrícula en Y
+      },
+      ticks: {
+        font: {
+          size: 12
+        },
+        color: '#6b7280', // gray-500
+        callback: (value) => {
+          if (value === 0) return '$0'
+          return `$${(value / 1000).toFixed(0)}k`
+        }
+      },
+      border: {
+        display: false
+      },
+      beginAtZero: true
+    }
+  },
+  interaction: {
+    intersect: false,
+    mode: 'index'
+  }
+}
 
 const averageRevenue = computed(() => {
   const total = monthsData.value.reduce((sum, d) => sum + d.amount, 0)

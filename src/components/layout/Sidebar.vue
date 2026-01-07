@@ -9,19 +9,19 @@
 
         <!-- Navigation -->
         <div class="flex-1 flex flex-col overflow-y-auto">
-          <nav class="flex-1 px-2 py-4 space-y-1">
+          <nav class="flex-1 px-2 py-4 space-y-2">
             <router-link
               v-for="item in navigation"
               :key="item.name"
               :to="item.to"
               :class="[
                 isActive(item.to) 
-                  ? 'bg-gray-900 text-white' 
-                  : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                'group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors'
+                  ? 'bg-emerald-50 text-emerald-600 border-l-4 border-emerald-500' 
+                  : 'text-gray-300 hover:bg-gray-700 hover:text-white border-l-4 border-transparent',
+                'group flex items-center px-4 py-3 text-sm font-medium rounded-r-md transition-all duration-200'
               ]"
             >
-              <span class="text-xl mr-3">{{ item.icon }}</span>
+              <component :is="item.icon" class="w-5 h-5 mr-3" />
               {{ item.name }}
             </router-link>
           </nav>
@@ -38,10 +38,10 @@
             </div>
             <button
               @click="handleLogout"
-              class="ml-2 text-gray-300 hover:text-white transition-colors"
+              class="ml-2 p-2 text-gray-300 hover:text-white hover:bg-gray-600 rounded-md transition-colors"
               title="Cerrar sesión"
             >
-              Salir
+              <LogOut class="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -54,16 +54,17 @@
 import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
+import { LayoutDashboard, Users, CheckCircle, DollarSign, LogOut } from 'lucide-vue-next'
 
 const router = useRouter()
 const route = useRoute()
 const userStore = useUserStore()
 
 const navigation = [
-  { name: 'Dashboard', to: '/' },
-  { name: 'Socios', to: '/miembros' },
-  { name: 'Check-In', to: '/checkin' },
-  { name: 'Pagos', to: '/pagos/nuevo' }
+  { name: 'Dashboard', to: '/', icon: LayoutDashboard },
+  { name: 'Socios', to: '/miembros', icon: Users },
+  { name: 'Check-In', to: '/checkin', icon: CheckCircle },
+  { name: 'Pagos', to: '/pagos/nuevo', icon: DollarSign }
 ]
 
 function isActive(path) {

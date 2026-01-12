@@ -27,7 +27,8 @@ const navigation = [
   { name: 'Inicio', to: '/' },
   { name: 'Socios', to: '/miembros' },
   { name: 'Check-In', to: '/checkin' },
-  { name: 'Pagos', to: '/pagos/nuevo' }
+  { name: 'Pagos', to: '/pagos/nuevo' },
+  { name: 'Caja', to: '/caja' }
 ]
 
 function isActive(path) {

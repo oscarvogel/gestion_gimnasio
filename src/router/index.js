@@ -64,6 +64,11 @@ const routes = [
         path: 'pagos/nuevo',
         name: 'NewPayment',
         component: NewPaymentView
+      },
+      {
+        path: 'caja',
+        name: 'Cash',
+        component: () => import('@/views/Cash/CashView.vue')
       }
     ]
   }

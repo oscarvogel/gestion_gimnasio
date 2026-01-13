@@ -265,6 +265,7 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
+import { toast } from 'vue-sonner'
 import { useCashRegister } from '@/composables/useCashRegister'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
@@ -358,14 +359,14 @@ const handleSubmit = async (formData) => {
     // Recargar con el rango actual
     handleFilterClick()
   } else {
-    alert('Error al registrar el movimiento: ' + result.error)
+    toast.error(`Error al registrar el movimiento: ${result.error}`, { duration: 5000 })
   }
 }
 
 const handleExportExcel = async () => {
   // Validar que hay datos
   if (transactions.value.length === 0) {
-    alert('⚠️ No hay movimientos para exportar en este período')
+    toast.warning('No hay movimientos para exportar en este período', { duration: 3000 })
     return
   }
 
@@ -375,17 +376,15 @@ const handleExportExcel = async () => {
     const start = new Date(startDate.value + 'T12:00:00')
     const end = new Date(endDate.value + 'T12:00:00')
     
-    const result = await exportToExcel(start, end)
+    const exportPromise = exportToExcel(start, end)
     
-    if (result.success) {
-      // El archivo ya fue descargado automáticamente
-      alert('✅ Reporte exportado exitosamente')
-    } else {
-      throw new Error(result.error)
-    }
+    await toast.promise(exportPromise, {
+      loading: 'Generando archivo Excel...',
+      success: 'Reporte exportado exitosamente',
+      error: (err) => `Error al exportar: ${err.message || 'Error desconocido'}`
+    })
   } catch (err) {
     console.error('Error al exportar:', err)
-    alert(`❌ Error al exportar: ${err.message}`)
   } finally {
     exportingExcel.value = false
   }

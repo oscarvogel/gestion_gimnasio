@@ -216,6 +216,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { toast } from 'vue-sonner'
 import { supabase } from '@/lib/supabase'
 import { usePayments } from '@/composables/usePayments'
 import { useParameters } from '@/composables/useParameters'
@@ -332,16 +333,26 @@ function updateDates() {
 
 async function handleSubmit() {
   if (!selectedMember.value) {
-    alert('Por favor selecciona un socio')
+    toast.error('Por favor selecciona un socio', { duration: 3000 })
+    return
+  }
+  
+  if (!formData.value.plan_id) {
+    toast.error('Por favor selecciona un plan', { duration: 3000 })
     return
   }
 
-  const result = await createPayment(formData.value)
-
-  if (result.success) {
-    showSuccessModal.value = true
-    resetForm()
-  }
+  const paymentPromise = createPayment(formData.value)
+  
+  toast.promise(paymentPromise, {
+    loading: 'Registrando pago...',
+    success: () => {
+      showSuccessModal.value = true
+      resetForm()
+      return 'Pago registrado correctamente'
+    },
+    error: 'Error al registrar el pago'
+  })
 }
 
 function resetForm() {

@@ -9,11 +9,15 @@
     </div>
     <!-- Una vez inicializado, mostrar el contenido -->
     <router-view v-else />
+    
+    <!-- Toaster Global para notificaciones -->
+    <Toaster position="top-center" :richColors="true" />
   </div>
 </template>
 
 <script setup>
 import { onMounted } from 'vue'
+import { Toaster } from 'vue-sonner'
 import { useUserStore } from './stores/userStore'
 
 const userStore = useUserStore()

@@ -160,27 +160,15 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
+import { toast } from 'vue-sonner'
 import { Users, UserPlus, Edit, XCircle, CheckCircle } from 'lucide-vue-next'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import StaffFormModal from '@/components/staff/StaffFormModal.vue'
 import { useStaff } from '@/composables/useStaff'
+import { confirmAlert } from '@/lib/alerts'
 
 const { staffList, loading, loadStaff, toggleStatus } = useStaff()
-
-// Debug: Ver qué datos hay en staffList
-watch(staffList, (newValue) => {
-  console.log('🔍 staffList actualizado:', JSON.parse(JSON.stringify(newValue)))
-  if (newValue.length > 0) {
-    console.log('📝 Primer elemento:', {
-      usuario: newValue[0].usuario,
-      email: newValue[0].email,
-      rol: newValue[0].rol,
-      activo: newValue[0].activo,
-      id: newValue[0].id
-    })
-  }
-}, { deep: true })
 
 const showModal = ref(false)
 const selectedStaff = ref(null)
@@ -210,13 +198,18 @@ const handleSuccess = () => {
 
 const handleToggleStatus = async (staff) => {
   const action = staff.activo ? 'desactivar' : 'activar'
-  if (!confirm(`¿Estás seguro de ${action} a ${staff.usuario}?`)) return
+  const confirmed = await confirmAlert(
+    `${action === 'desactivar' ? 'Desactivar' : 'Activar'} Usuario`,
+    `¿Estás seguro de ${action} a ${staff.usuario}?`
+  )
+  
+  if (!confirmed) return
 
   const result = await toggleStatus(staff.id, staff.activo)
   if (result.success) {
-    alert(`Usuario ${action === 'desactivar' ? 'desactivado' : 'activado'} correctamente`)
+    toast.success(`Usuario ${action === 'desactivar' ? 'desactivado' : 'activado'} correctamente`, { duration: 2000 })
   } else {
-    alert(`Error al ${action} usuario: ${result.error}`)
+    toast.error(`Error al ${action} usuario: ${result.error}`, { duration: 5000 })
   }
 }
 

@@ -53,7 +53,9 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { toast } from 'vue-sonner'
 import { useUserStore } from '@/stores/userStore'
+import { confirmAlert } from '@/lib/alerts'
 import { LayoutDashboard, Users, CheckCircle, DollarSign, Wallet, Settings, LogOut } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -86,7 +88,15 @@ function isActive(path) {
 }
 
 async function handleLogout() {
+  const confirmed = await confirmAlert(
+    'Cerrar Sesión',
+    '¿Estás seguro de que deseas salir?'
+  )
+  
+  if (!confirmed) return
+  
   await userStore.logout()
+  toast.success('Sesión cerrada correctamente', { duration: 2000 })
   router.push({ name: 'Login' })
 }
 </script>

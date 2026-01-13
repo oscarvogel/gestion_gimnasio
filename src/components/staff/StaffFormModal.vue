@@ -185,6 +185,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { toast } from 'vue-sonner'
 import { X, Eye, EyeOff, RefreshCw, CheckCircle, Copy, AlertCircle } from 'lucide-vue-next'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
@@ -252,7 +253,21 @@ const generateRandomPassword = () => {
 const handleSubmit = async () => {
   errors.value.general = ''
   
-  if (!validateUsuario()) return
+  if (!validateUsuario()) {
+    toast.warning('El nombre de usuario no puede contener espacios', { duration: 3000 })
+    return
+  }
+  
+  // Validación de campos vacíos
+  if (!form.value.usuario || !form.value.rol) {
+    toast.warning('Complete todos los campos requeridos', { duration: 3000 })
+    return
+  }
+  
+  if (!isEditing.value && (!form.value.email || !form.value.password)) {
+    toast.warning('Complete todos los campos requeridos', { duration: 3000 })
+    return
+  }
 
   loading.value = true
 
@@ -278,6 +293,7 @@ const handleSubmit = async () => {
 
     if (result.success) {
       if (isEditing.value) {
+        toast.success('Usuario actualizado correctamente', { duration: 2000 })
         emit('success')
         emit('close')
       } else {
@@ -285,9 +301,11 @@ const handleSubmit = async () => {
         showSuccess.value = true
       }
     } else {
+      toast.error(result.error || 'Error al guardar el usuario', { duration: 5000 })
       errors.value.general = result.error || 'Error al guardar el usuario'
     }
   } catch (err) {
+    toast.error(err.message || 'Error inesperado', { duration: 5000 })
     errors.value.general = err.message || 'Error inesperado'
   } finally {
     loading.value = false
@@ -297,9 +315,10 @@ const handleSubmit = async () => {
 const copyPassword = async () => {
   try {
     await navigator.clipboard.writeText(generatedPassword.value)
-    alert('Contraseña copiada al portapapeles')
+    toast.success('Contraseña copiada al portapapeles', { duration: 2000 })
   } catch (err) {
     console.error('Error copiando:', err)
+    toast.error('Error al copiar la contraseña', { duration: 3000 })
   }
 }
 

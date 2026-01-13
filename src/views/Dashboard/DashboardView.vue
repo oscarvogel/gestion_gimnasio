@@ -4,7 +4,7 @@
       <!-- Header -->
       <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-800 mb-2">Dashboard</h1>
-        <p class="text-gray-400">
+        <p class="text-gray-400 mb-6">
           Bienvenido, {{ userStore.userEmail }}
           <span v-if="userStore.isAdmin" class="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded">
             Admin
@@ -13,6 +13,45 @@
             Staff
           </span>
         </p>
+
+        <!-- Botones de Acceso Rápido -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <BaseButton
+            variant="primary"
+            @click="router.push({ name: 'NewMember' })"
+            class="flex items-center justify-center gap-2 py-3"
+          >
+            <UserPlus class="w-5 h-5" />
+            Nuevo Socio
+          </BaseButton>
+
+          <BaseButton
+            variant="primary"
+            @click="router.push({ name: 'NewPayment' })"
+            class="flex items-center justify-center gap-2 py-3"
+          >
+            <BadgeDollarSign class="w-5 h-5" />
+            Registrar Pago
+          </BaseButton>
+
+          <BaseButton
+            variant="primary"
+            @click="router.push({ name: 'CheckIn' })"
+            class="flex items-center justify-center gap-2 py-3"
+          >
+            <CheckCircle class="w-5 h-5" />
+            Check-In
+          </BaseButton>
+
+          <BaseButton
+            variant="secondary"
+            @click="showLastAccessModal = true"
+            class="flex items-center justify-center gap-2 py-3"
+          >
+            <ListChecks class="w-5 h-5" />
+            Ver Últimos Accesos
+          </BaseButton>
+        </div>
       </div>
 
       <!-- Loading -->
@@ -85,7 +124,7 @@
             <h2 class="text-xl font-bold text-gray-800">Últimos Check-Ins</h2>
             <BaseButton
               variant="ghost"
-              @click="router.push('/checkin')"
+              @click="showLastAccessModal = true"
               size="sm"
             >
               Ver todos
@@ -127,32 +166,14 @@
           </div>
         </div>
 
-        <!-- Accesos Rápidos -->
-        <div class="bg-white rounded-xl shadow-sm p-6 mt-6">
-          <h2 class="text-xl font-bold text-gray-800 mb-4">Accesos Rápidos</h2>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <BaseButton
-              variant="primary"
-              @click="router.push({ name: 'CheckIn' })"
-            >
-              Check-In
-            </BaseButton>
-            <BaseButton
-              variant="primary"
-              @click="router.push({ name: 'NewPayment' })"
-            >
-              Nuevo Pago
-            </BaseButton>
-            <BaseButton
-              variant="primary"
-              @click="router.push({ name: 'NewMember' })"
-            >
-              Nuevo Socio
-            </BaseButton>
-          </div>
-        </div>
       </div>
     </div>
+
+    <!-- Modal de Últimos Accesos -->
+    <LastAccessModal
+      v-if="showLastAccessModal"
+      @close="showLastAccessModal = false"
+    />
   </div>
 </template>
 
@@ -161,18 +182,20 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { useGymStore } from '@/stores/gymStore'
-import { Wallet, Users, Activity, AlertCircle } from 'lucide-vue-next'
+import { Wallet, Users, Activity, AlertCircle, UserPlus, BadgeDollarSign, CheckCircle, ListChecks } from 'lucide-vue-next'
 import StatCard from '@/components/dashboard/StatCard.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import AssistanceChart from '@/components/charts/AssistanceChart.vue'
 import RevenueChart from '@/components/charts/RevenueChart.vue'
+import LastAccessModal from '@/components/modals/LastAccessModal.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
 const gymStore = useGymStore()
 
 const loading = ref(false)
+const showLastAccessModal = ref(false)
 const stats = ref({
   totalMembers: 0,
   activeMembers: 0,

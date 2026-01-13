@@ -60,17 +60,19 @@
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Apto Físico
                 </th>
+                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Acciones
+                </th>
               </tr>
             </thead>
             <tbody class="bg-white">
               <tr
                 v-for="member in filteredMembers"
                 :key="member.id"
-                class="border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors"
-                @click="goToMemberDetail(member.id)"
+                class="border-b border-gray-100 hover:bg-gray-50 transition-colors"
               >
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
+                  <div class="flex items-center cursor-pointer" @click="goToMemberDetail(member.id)">
                     <div class="h-10 w-10 flex-shrink-0">
                       <div class="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center">
                         <span class="text-sm font-semibold text-slate-600">
@@ -79,7 +81,7 @@
                       </div>
                     </div>
                     <div class="ml-4">
-                      <div class="text-sm font-medium text-gray-900">
+                      <div class="text-sm font-medium text-gray-900 hover:text-emerald-600">
                         {{ member.nombre }} {{ member.apellido }}
                       </div>
                     </div>
@@ -103,6 +105,24 @@
                     :status="member.estado_apto_fisico === 'vigente' ? 'vigente' : 'vencido_apto'"
                     :label="member.estado_apto_fisico === 'vigente' ? 'Vigente' : 'Vencido'"
                   />
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center justify-center gap-2">
+                    <button
+                      @click.stop="openHistoryModal(member, 'payments')"
+                      class="p-2 hover:bg-emerald-50 rounded-lg transition-colors group"
+                      title="Ver Pagos"
+                    >
+                      <Receipt class="w-5 h-5 text-gray-400 group-hover:text-emerald-600" />
+                    </button>
+                    <button
+                      @click.stop="openHistoryModal(member, 'attendance')"
+                      class="p-2 hover:bg-blue-50 rounded-lg transition-colors group"
+                      title="Ver Asistencias"
+                    >
+                      <CalendarClock class="w-5 h-5 text-gray-400 group-hover:text-blue-600" />
+                    </button>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -132,15 +152,31 @@
                 <p class="text-sm text-gray-500">DNI: {{ member.dni }}</p>
               </div>
             </div>
-            <div class="flex gap-2">
-              <StatusBadge
-                :status="member.estado_cuota"
-                :label="member.estado_cuota === 'activo' ? 'Al día' : 'Vencido'"
-              />
-              <StatusBadge
-                :status="member.estado_apto_fisico === 'vigente' ? 'vigente' : 'vencido_apto'"
-                :label="member.estado_apto_fisico === 'vigente' ? 'Apto OK' : 'Apto Vencido'"
-              />
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex gap-2">
+                <StatusBadge
+                  :status="member.estado_cuota"
+                  :label="member.estado_cuota === 'activo' ? 'Al día' : 'Vencido'"
+                />
+                <StatusBadge
+                  :status="member.estado_apto_fisico === 'vigente' ? 'vigente' : 'vencido_apto'"
+                  :label="member.estado_apto_fisico === 'vigente' ? 'Apto OK' : 'Apto Vencido'"
+                />
+              </div>
+              <div class="flex gap-2">
+                <button
+                  @click.stop="openHistoryModal(member, 'payments')"
+                  class="p-2 hover:bg-emerald-50 rounded-lg transition-colors"
+                >
+                  <Receipt class="w-5 h-5 text-emerald-600" />
+                </button>
+                <button
+                  @click.stop="openHistoryModal(member, 'attendance')"
+                  class="p-2 hover:bg-blue-50 rounded-lg transition-colors"
+                >
+                  <CalendarClock class="w-5 h-5 text-blue-600" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -151,6 +187,14 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal de Historial -->
+    <MemberHistoryModal
+      v-if="showHistoryModal"
+      :member-id="selectedMemberId"
+      :member-name="selectedMemberName"
+      @close="showHistoryModal = false"
+    />
   </div>
 </template>
 
@@ -158,12 +202,17 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMembers } from '@/composables/useMembers'
+import { Receipt, CalendarClock } from 'lucide-vue-next'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
+import MemberHistoryModal from '@/components/modals/MemberHistoryModal.vue'
 
 const router = useRouter()
 const { members, loading, error, getMembers } = useMembers()
 
 const searchQuery = ref('')
+const showHistoryModal = ref(false)
+const selectedMemberId = ref('')
+const selectedMemberName = ref('')
 
 // Función para obtener iniciales
 function getInitials(nombre, apellido) {
@@ -190,6 +239,12 @@ function goToNewMember() {
 
 function goToMemberDetail(id) {
   router.push({ name: 'MemberDetail', params: { id } })
+}
+
+function openHistoryModal(member, tab = 'payments') {
+  selectedMemberId.value = member.id
+  selectedMemberName.value = `${member.nombre} ${member.apellido}`
+  showHistoryModal.value = true
 }
 
 onMounted(async () => {

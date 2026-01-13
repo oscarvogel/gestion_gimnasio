@@ -37,8 +37,11 @@
           <div
             v-for="member in searchResults"
             :key="member.id"
-            @click="handleCheckIn(member)"
-            class="cursor-pointer transform transition-transform hover:scale-[1.02]"
+            @click="canCheckIn(member) && handleCheckIn(member)"
+            :class="[
+              'transform transition-transform',
+              canCheckIn(member) ? 'cursor-pointer hover:scale-[1.02]' : 'cursor-not-allowed opacity-90'
+            ]"
           >
             <!-- ACCESO PERMITIDO -->
             <div
@@ -87,7 +90,15 @@
                     <div class="flex-1">
                       <span class="text-2xl font-bold text-red-600 block">ACCESO DENEGADO</span>
                       <span class="text-base text-red-500 font-medium">
-                        {{ member.estado_cuota !== 'activo' ? 'Cuota Vencida' : 'Apto Físico Vencido' }}
+                        <span v-if="member.estado_cuota !== 'activo' && member.estado_apto_fisico !== 'vigente'">
+                          Cuota y Apto Físico Vencidos
+                        </span>
+                        <span v-else-if="member.estado_cuota !== 'activo'">
+                          Cuota Vencida
+                        </span>
+                        <span v-else>
+                          Apto Físico Vencido
+                        </span>
                       </span>
                     </div>
                   </div>
@@ -243,7 +254,25 @@ async function searchMembers() {
 }
 
 function canCheckIn(member) {
-  return member.estado_cuota === 'activo' && member.estado_apto_fisico === 'vigente'
+  // REGLA ESTRICTA: Ambos deben estar en estado válido
+  // - Cuota: debe ser 'activo'
+  // - Apto Físico: debe ser 'vigente' (si está vencido no puede entrar)
+  const cuotaActiva = member.estado_cuota === 'activo'
+  const aptoVigente = member.estado_apto_fisico === 'vigente'
+  
+  // Debug: mostrar en consola para troubleshooting
+  if (!cuotaActiva || !aptoVigente) {
+    console.log('❌ Acceso denegado:', {
+      nombre: `${member.nombre} ${member.apellido}`,
+      dni: member.dni,
+      estado_cuota: member.estado_cuota,
+      estado_apto_fisico: member.estado_apto_fisico,
+      cuotaActiva,
+      aptoVigente
+    })
+  }
+  
+  return cuotaActiva && aptoVigente
 }
 
 function getInitials(nombre, apellido) {

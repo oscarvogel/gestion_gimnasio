@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
+import imageCompression from 'browser-image-compression'
 
 export function useMembers() {
   const members = ref([])
@@ -10,17 +11,27 @@ export function useMembers() {
   /**
    * Obtiene todos los socios desde la vista v_socios_estado
    * Esta vista incluye el cálculo de estados (activo, vencido)
+   * @param {boolean} includeInactive - Si es true, incluye socios inactivos
    */
-  async function getMembers() {
+  async function getMembers(includeInactive = false) {
     try {
       loading.value = true
       error.value = null
 
-      const { data, error: fetchError } = await supabase
+      let query = supabase
         .from('v_socios_estado')
         .select('*')
+      
+      // Filtrar solo activos si includeInactive es false
+      if (!includeInactive) {
+        query = query.eq('activo', true)
+      }
+      
+      query = query
         .order('estado_cuota', { ascending: false }) // Vencidos primero
         .order('apellido', { ascending: true })
+
+      const { data, error: fetchError } = await query
 
       if (fetchError) throw fetchError
 
@@ -142,6 +153,84 @@ export function useMembers() {
   }
 
   /**
+   * Sube un avatar al bucket de Storage con compresión
+   * @param {File} file - Archivo de imagen
+   * @param {string} memberId - ID del socio
+   * @returns {Promise<{success: boolean, url?: string, error?: string}>}
+   */
+  async function uploadAvatar(file, memberId) {
+    try {
+      // Validar que sea una imagen
+      if (!file.type.startsWith('image/')) {
+        throw new Error('El archivo debe ser una imagen')
+      }
+
+      // Comprimir imagen
+      const options = {
+        maxSizeMB: 0.5,
+        maxWidthOrHeight: 800,
+        useWebWorker: true
+      }
+
+      const compressedFile = await imageCompression(file, options)
+
+      // Generar nombre único
+      const timestamp = Date.now()
+      const fileName = `${memberId}_${timestamp}.jpg`
+
+      // Subir a Storage
+      const { data, error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, compressedFile, {
+          contentType: 'image/jpeg',
+          upsert: false
+        })
+
+      if (uploadError) throw uploadError
+
+      // Obtener URL pública
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName)
+
+      return { success: true, url: publicUrl }
+    } catch (err) {
+      console.error('Error al subir avatar:', err)
+      return { success: false, error: err.message }
+    }
+  }
+
+  /**
+   * Elimina un avatar del bucket de Storage
+   * @param {string} avatarUrl - URL completa del avatar
+   * @returns {Promise<{success: boolean}>}
+   */
+  async function deleteAvatar(avatarUrl) {
+    try {
+      if (!avatarUrl) return { success: true }
+
+      // Extraer el nombre del archivo de la URL
+      const urlParts = avatarUrl.split('/')
+      const fileName = urlParts[urlParts.length - 1]
+
+      // Eliminar del bucket
+      const { error: deleteError } = await supabase.storage
+        .from('avatars')
+        .remove([fileName])
+
+      if (deleteError) {
+        console.error('Error al eliminar avatar:', deleteError)
+        // No lanzar error, solo log (puede que el archivo ya no exista)
+      }
+
+      return { success: true }
+    } catch (err) {
+      console.error('Error al eliminar avatar:', err)
+      return { success: false, error: err.message }
+    }
+  }
+
+  /**
    * Limpia los errores
    */
   function clearError() {
@@ -160,6 +249,8 @@ export function useMembers() {
     createMember,
     updateMember,
     deleteMember,
+    uploadAvatar,
+    deleteAvatar,
     clearError
   }
 }

@@ -22,7 +22,18 @@
         <!-- Header de la tarjeta -->
         <div class="px-6 py-4 border-b border-gray-100">
           <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <h2 class="text-lg font-semibold text-gray-800">Lista de Socios</h2>
+            <div class="flex items-center gap-4">
+              <h2 class="text-lg font-semibold text-gray-800">Lista de Socios</h2>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  v-model="showInactive"
+                  @change="handleToggleInactive"
+                  class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500"
+                />
+                <span class="text-sm text-gray-600">Mostrar inactivos</span>
+              </label>
+            </div>
             <div class="flex flex-col sm:flex-row gap-3">
               <input
                 v-model="searchQuery"
@@ -46,6 +57,9 @@
             <thead class="bg-gray-50">
               <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Foto
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Socio
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -58,7 +72,7 @@
                   Estado Cuota
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Apto Físico
+                  Estado
                 </th>
                 <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Acciones
@@ -69,21 +83,31 @@
               <tr
                 v-for="member in filteredMembers"
                 :key="member.id"
-                class="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                :class="[
+                  'border-b border-gray-100 hover:bg-gray-50 transition-colors',
+                  !member.activo && 'opacity-60'
+                ]"
               >
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center cursor-pointer" @click="goToMemberDetail(member.id)">
-                    <div class="h-10 w-10 flex-shrink-0">
-                      <div class="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center">
-                        <span class="text-sm font-semibold text-slate-600">
-                          {{ getInitials(member.nombre, member.apellido) }}
-                        </span>
-                      </div>
+                  <div class="h-10 w-10 flex-shrink-0">
+                    <img
+                      v-if="member.foto_url"
+                      :src="member.foto_url"
+                      :alt="`${member.nombre} ${member.apellido}`"
+                      class="h-10 w-10 rounded-full object-cover"
+                    />
+                    <div v-else class="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center">
+                      <span class="text-sm font-semibold text-slate-600">
+                        {{ getInitials(member.nombre, member.apellido) }}
+                      </span>
                     </div>
-                    <div class="ml-4">
-                      <div class="text-sm font-medium text-gray-900 hover:text-emerald-600">
-                        {{ member.nombre }} {{ member.apellido }}
-                      </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="cursor-pointer" @click="goToMemberDetail(member.id)">
+                    <div class="text-sm font-medium text-gray-900 hover:text-emerald-600 flex items-center gap-2">
+                      {{ member.nombre }} {{ member.apellido }}
+                      <span v-if="member.es_socio_club" class="text-yellow-500" title="Socio Club">⭐</span>
                     </div>
                   </div>
                 </td>
@@ -102,9 +126,10 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <StatusBadge
-                    :status="member.estado_apto_fisico === 'vigente' ? 'vigente' : 'vencido_apto'"
-                    :label="member.estado_apto_fisico === 'vigente' ? 'Vigente' : 'Vencido'"
-                  />
+                    :type="member.activo ? 'success' : 'secondary'"
+                  >
+                    {{ member.activo ? 'Activo' : 'Inactivo' }}
+                  </StatusBadge>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center justify-center gap-2">
@@ -134,34 +159,47 @@
           <div
             v-for="member in filteredMembers"
             :key="member.id"
-            class="p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors last:border-b-0"
+            :class="[
+              'p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors last:border-b-0',
+              !member.activo && 'opacity-60'
+            ]"
             @click="goToMemberDetail(member.id)"
           >
             <div class="flex items-start mb-3">
               <div class="h-10 w-10 flex-shrink-0">
-                <div class="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center">
+                <img
+                  v-if="member.foto_url"
+                  :src="member.foto_url"
+                  :alt="`${member.nombre} ${member.apellido}`"
+                  class="h-10 w-10 rounded-full object-cover"
+                />
+                <div v-else class="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center">
                   <span class="text-sm font-semibold text-slate-600">
                     {{ getInitials(member.nombre, member.apellido) }}
                   </span>
                 </div>
               </div>
               <div class="ml-3 flex-1">
-                <h3 class="text-sm font-medium text-gray-900">
+                <h3 class="text-sm font-medium text-gray-900 flex items-center gap-1">
                   {{ member.nombre }} {{ member.apellido }}
+                  <span v-if="member.es_socio_club" class="text-yellow-500" title="Socio Club">⭐</span>
                 </h3>
                 <p class="text-sm text-gray-500">DNI: {{ member.dni }}</p>
               </div>
             </div>
             <div class="flex items-center justify-between gap-2">
-              <div class="flex gap-2">
+              <div class="flex gap-2 flex-wrap">
                 <StatusBadge
                   :status="member.estado_cuota"
                   :label="member.estado_cuota === 'activo' ? 'Al día' : 'Vencido'"
+                  size="sm"
                 />
                 <StatusBadge
-                  :status="member.estado_apto_fisico === 'vigente' ? 'vigente' : 'vencido_apto'"
-                  :label="member.estado_apto_fisico === 'vigente' ? 'Apto OK' : 'Apto Vencido'"
-                />
+                  :type="member.activo ? 'success' : 'secondary'"
+                  size="sm"
+                >
+                  {{ member.activo ? 'Activo' : 'Inactivo' }}
+                </StatusBadge>
               </div>
               <div class="flex gap-2">
                 <button
@@ -210,6 +248,7 @@ const router = useRouter()
 const { members, loading, error, getMembers } = useMembers()
 
 const searchQuery = ref('')
+const showInactive = ref(false)
 const showHistoryModal = ref(false)
 const selectedMemberId = ref('')
 const selectedMemberName = ref('')
@@ -219,6 +258,11 @@ function getInitials(nombre, apellido) {
   const firstInitial = nombre ? nombre.charAt(0).toUpperCase() : ''
   const lastInitial = apellido ? apellido.charAt(0).toUpperCase() : ''
   return firstInitial + lastInitial
+}
+
+// Manejar cambio en toggle de inactivos
+async function handleToggleInactive() {
+  await getMembers(showInactive.value)
 }
 
 // Filtrar socios por búsqueda
@@ -248,6 +292,6 @@ function openHistoryModal(member, tab = 'payments') {
 }
 
 onMounted(async () => {
-  await getMembers()
+  await getMembers(showInactive.value)
 })
 </script>

@@ -128,6 +128,11 @@
                 <p class="text-5xl font-bold text-emerald-600">
                   {{ formData.monto ? `$${formData.monto}` : '$0' }}
                 </p>
+                <!-- Badge de tarifa aplicada -->
+                <div v-if="tarifaBadge" class="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium" :class="tarifaBadge.class">
+                  <span>{{ tarifaBadge.icon }}</span>
+                  <span>{{ tarifaBadge.text }}</span>
+                </div>
               </div>
 
               <!-- Plan Seleccionado -->
@@ -215,7 +220,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import { supabase } from '@/lib/supabase'
 import { usePayments } from '@/composables/usePayments'
@@ -278,6 +283,27 @@ const paymentMethodLabel = computed(() => {
   return formData.value.metodo_pago || '—'
 })
 
+// Badge de tarifa aplicada
+const tarifaBadge = computed(() => {
+  if (!selectedMember.value || !formData.value.plan_id || !formData.value.monto) return null
+  
+  const isSocioClub = selectedMember.value.es_socio_club
+  
+  if (isSocioClub) {
+    return {
+      icon: '🏆',
+      text: 'Tarifa Club Aplicada',
+      class: 'bg-yellow-100 text-yellow-800 border border-yellow-300'
+    }
+  } else {
+    return {
+      icon: '💳',
+      text: 'Tarifa Estándar',
+      class: 'bg-gray-100 text-gray-700 border border-gray-300'
+    }
+  }
+})
+
 async function searchMembers() {
   if (searchTimeout) clearTimeout(searchTimeout)
   
@@ -290,8 +316,9 @@ async function searchMembers() {
     try {
       const query = memberSearch.value.toLowerCase()
       const { data } = await supabase
-        .from('members')
-        .select('id, nombre, apellido, dni')
+        .from('v_socios_estado')
+        .select('id, nombre, apellido, dni, es_socio_club, plan_id')
+        .eq('activo', true)
         .or(`nombre.ilike.%${query}%,apellido.ilike.%${query}%,dni.ilike.%${query}%`)
         .limit(5)
 
@@ -307,6 +334,13 @@ function selectMember(member) {
   formData.value.member_id = member.id
   memberSearch.value = `${member.nombre} ${member.apellido}`
   memberSearchResults.value = []
+  
+  // Auto-seleccionar plan si el socio tiene uno asociado
+  if (member.plan_id) {
+    formData.value.plan_id = member.plan_id
+    updateDates()
+    toast.success(`Plan "${selectedPlanName.value}" seleccionado automáticamente`, { duration: 2000 })
+  }
 }
 
 function clearMember() {
@@ -321,8 +355,12 @@ function updateDates() {
   const plan = plans.value.find(p => p.id == formData.value.plan_id)
   if (!plan) return
 
-  // Actualizar monto
-  formData.value.monto = plan.precio
+  // Calcular monto según si es socio club o no
+  if (selectedMember.value && selectedMember.value.es_socio_club) {
+    formData.value.monto = plan.precio_socio || plan.precio
+  } else {
+    formData.value.monto = plan.precio
+  }
 
   // Calcular fecha fin
   const startDate = new Date(formData.value.fecha_inicio)
@@ -372,6 +410,16 @@ function resetForm() {
 function closeSuccessModal() {
   showSuccessModal.value = false
 }
+
+// Watcher para recalcular tarifa cuando cambia el plan o el socio
+watch(
+  () => formData.value.plan_id,
+  () => {
+    if (formData.value.plan_id && selectedMember.value) {
+      updateDates()
+    }
+  }
+)
 
 onMounted(async () => {
   await fetchParameters()

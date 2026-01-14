@@ -27,7 +27,7 @@ export function useParameters() {
         // Cargar planes activos
         supabase
           .from('plans')
-          .select('*')
+          .select('id, nombre, dias_duracion, precio, precio_socio, activo')
           .eq('activo', true)
           .order('nombre'),
         

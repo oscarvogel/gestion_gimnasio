@@ -20,16 +20,21 @@ export function useReports() {
   const error = ref(null)
 
   /**
-   * Obtiene estadísticas financieras de los últimos 12 meses
+   * Obtiene estadísticas financieras en un rango de fechas
+   * @param {String} startDate - Fecha de inicio (ISO string)
+   * @param {String} endDate - Fecha de fin (ISO string)
    * Retorna: { mes, ingresos, egresos }
    */
-  async function fetchFinanceStats() {
+  async function fetchFinanceStats(startDate = null, endDate = null) {
     try {
       loading.finance = true
       error.value = null
 
       const { data, error: rpcError } = await supabase
-        .rpc('get_monthly_finance_stats')
+        .rpc('get_monthly_finance_stats', {
+          fecha_inicio: startDate,
+          fecha_fin: endDate
+        })
 
       if (rpcError) throw rpcError
 
@@ -45,16 +50,21 @@ export function useReports() {
   }
 
   /**
-   * Obtiene actividad por día de la semana (últimos 30 días)
+   * Obtiene actividad por día de la semana en un rango de fechas
+   * @param {String} startDate - Fecha de inicio (ISO string)
+   * @param {String} endDate - Fecha de fin (ISO string)
    * Retorna: { dia_semana, cantidad }
    */
-  async function fetchDailyActivity() {
+  async function fetchDailyActivity(startDate = null, endDate = null) {
     try {
       loading.daily = true
       error.value = null
 
       const { data, error: rpcError } = await supabase
-        .rpc('get_daily_activity_stats')
+        .rpc('get_daily_activity_stats', {
+          fecha_inicio: startDate,
+          fecha_fin: endDate
+        })
 
       if (rpcError) throw rpcError
 
@@ -70,16 +80,21 @@ export function useReports() {
   }
 
   /**
-   * Obtiene actividad por hora del día (últimos 30 días)
+   * Obtiene actividad por hora del día en un rango de fechas
+   * @param {String} startDate - Fecha de inicio (ISO string)
+   * @param {String} endDate - Fecha de fin (ISO string)
    * Retorna: { hora, cantidad }
    */
-  async function fetchHourlyActivity() {
+  async function fetchHourlyActivity(startDate = null, endDate = null) {
     try {
       loading.hourly = true
       error.value = null
 
       const { data, error: rpcError } = await supabase
-        .rpc('get_hourly_activity_stats')
+        .rpc('get_hourly_activity_stats', {
+          fecha_inicio: startDate,
+          fecha_fin: endDate
+        })
 
       if (rpcError) throw rpcError
 

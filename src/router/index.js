@@ -31,11 +31,6 @@ const routes = [
         component: DashboardView
       },
       {
-        path: 'analytics',
-        name: 'Analytics',
-        component: () => import('@/views/Analytics/AnalyticsView.vue')
-      },
-      {
         path: 'miembros',
         name: 'Members',
         component: MembersListView

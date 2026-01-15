@@ -4,7 +4,12 @@
       <!-- Header -->
       <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-800 mb-2">Reportes y Análisis</h1>
-        <p class="text-gray-600">Métricas clave para la toma de decisiones</p>
+        <p class="text-gray-600">Métricas clave para la toma de decisiones estratégicas</p>
+      </div>
+
+      <!-- Filtro de Rango de Fechas -->
+      <div class="mb-8">
+        <DateRangeFilter @change="handleDateRangeChange" />
       </div>
 
       <!-- Sección 1: Análisis Financiero -->
@@ -12,7 +17,7 @@
         <div class="flex items-center justify-between mb-4">
           <div>
             <h2 class="text-xl font-semibold text-gray-800">Análisis Financiero</h2>
-            <p class="text-sm text-gray-600">Ingresos vs Egresos - Últimos 12 meses</p>
+            <p class="text-sm text-gray-600">Evolución de Ingresos vs Egresos</p>
           </div>
           <div v-if="loading.finance" class="flex items-center gap-2 text-sm text-gray-500">
             <div class="h-4 w-4 animate-spin rounded-full border-2 border-solid border-emerald-500 border-r-transparent"></div>
@@ -29,7 +34,7 @@
       <section class="mb-8">
         <div class="mb-4">
           <h2 class="text-xl font-semibold text-gray-800">Patrones de Actividad</h2>
-          <p class="text-sm text-gray-600">Análisis de asistencia - Últimos 30 días</p>
+          <p class="text-sm text-gray-600">Análisis de asistencia en el período seleccionado</p>
         </div>
         
         <div class="grid md:grid-cols-2 gap-6">
@@ -80,8 +85,9 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useReports } from '@/composables/useReports'
+import DateRangeFilter from '@/components/reports/DateRangeFilter.vue'
 import FinanceChart from '@/components/reports/FinanceChart.vue'
 import DailyActivityChart from '@/components/reports/DailyActivityChart.vue'
 import HourlyActivityChart from '@/components/reports/HourlyActivityChart.vue'
@@ -97,12 +103,33 @@ const {
   fetchHourlyActivity
 } = useReports()
 
-onMounted(async () => {
-  // Cargar todos los datos en paralelo
-  await Promise.all([
-    fetchFinanceStats(),
-    fetchDailyActivity(),
-    fetchHourlyActivity()
-  ])
+// Estado del rango de fechas seleccionado
+const currentDateRange = ref({
+  startDate: null,
+  endDate: null
 })
+
+/**
+ * Maneja el cambio de rango de fechas desde el filtro
+ */
+async function handleDateRangeChange({ range, startDate, endDate }) {
+  currentDateRange.value = { startDate, endDate }
+  
+  // Recargar todos los datos con el nuevo rango
+  await loadReports(startDate, endDate)
+}
+
+/**
+ * Carga todos los reportes con el rango de fechas especificado
+ */
+async function loadReports(startDate, endDate) {
+  await Promise.all([
+    fetchFinanceStats(startDate, endDate),
+    fetchDailyActivity(startDate, endDate),
+    fetchHourlyActivity(startDate, endDate)
+  ])
+}
+
+// La carga inicial se hará cuando el DateRangeFilter emita su primer evento
+// (automáticamente al montarse con el rango por defecto)
 </script>

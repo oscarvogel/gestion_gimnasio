@@ -67,7 +67,6 @@
             :value="'$' + formatCurrency(stats.monthlyRevenue)"
             trend="+12%"
             :icon="Wallet"
-            route="/analytics?tab=revenue"
             icon-bg-color="bg-emerald-50"
             icon-color="text-emerald-600"
           />
@@ -77,7 +76,7 @@
             :value="stats.activeMembers"
             trend="+8%"
             :icon="Users"
-            route="/analytics?tab=members"
+            route="/miembros"
             icon-bg-color="bg-blue-50"
             icon-color="text-blue-600"
           />
@@ -87,7 +86,7 @@
             :value="stats.todayAttendance"
             trend="+5%"
             :icon="Activity"
-            route="/analytics?tab=attendance"
+            route="/checkin"
             icon-bg-color="bg-purple-50"
             icon-color="text-purple-600"
           />
@@ -103,18 +102,29 @@
           />
         </div>
 
-        <!-- Gráficos -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <!-- Gráfico de Ingresos (2/3) -->
-          <div class="lg:col-span-2 bg-white rounded-xl shadow-sm p-6">
-            <h3 class="text-lg font-bold text-gray-800 mb-4">Ingresos Mensuales</h3>
-            <RevenueChart />
-          </div>
-
-          <!-- Gráfico de Asistencia (1/3) -->
-          <div class="bg-white rounded-xl shadow-sm p-6">
-            <h3 class="text-lg font-bold text-gray-800 mb-4">Asistencia Semanal</h3>
-            <AssistanceChart />
+        <!-- Tarjeta de Alerta: Socios Vencidos -->
+        <div v-if="stats.expiredMembers > 0" class="bg-red-50 border-l-4 border-red-500 rounded-lg p-6 mb-8">
+          <div class="flex items-start justify-between">
+            <div class="flex items-start gap-4">
+              <div class="p-3 bg-red-100 rounded-lg">
+                <AlertCircle class="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-red-900 mb-1">
+                  {{ stats.expiredMembers }} Socios con Cuota Vencida
+                </h3>
+                <p class="text-sm text-red-700">
+                  Hay socios con pagos pendientes que requieren atención
+                </p>
+              </div>
+            </div>
+            <BaseButton
+              variant="danger"
+              @click="router.push({ name: 'Members', query: { filter: 'vencidos' } })"
+              class="flex items-center gap-2"
+            >
+              Ver Listado
+            </BaseButton>
           </div>
         </div>
 
@@ -187,8 +197,6 @@ import { Wallet, Users, Activity, AlertCircle, UserPlus, BadgeDollarSign, CheckC
 import StatCard from '@/components/dashboard/StatCard.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
-import AssistanceChart from '@/components/charts/AssistanceChart.vue'
-import RevenueChart from '@/components/charts/RevenueChart.vue'
 import LastAccessModal from '@/components/modals/LastAccessModal.vue'
 
 const router = useRouter()

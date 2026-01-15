@@ -22,7 +22,7 @@
             :class="[
               'flex items-center gap-2 px-6 py-3 text-sm font-medium border-b-2 transition-colors',
               activeTab === 'payments'
-                ? 'border-emerald-600 text-emerald-600'
+                ? 'border-primary-600 text-primary-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             ]"
           >
@@ -34,7 +34,7 @@
             :class="[
               'flex items-center gap-2 px-6 py-3 text-sm font-medium border-b-2 transition-colors',
               activeTab === 'attendance'
-                ? 'border-emerald-600 text-emerald-600'
+                ? 'border-primary-600 text-primary-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             ]"
           >
@@ -48,7 +48,7 @@
       <div class="p-6 overflow-y-auto max-h-[calc(80vh-160px)]">
         <!-- Loading -->
         <div v-if="loading" class="text-center py-8">
-          <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-300 border-t-emerald-600"></div>
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-300 border-t-primary-600"></div>
           <p class="mt-4 text-gray-500">Cargando datos...</p>
         </div>
 
@@ -68,7 +68,7 @@
               <div class="flex items-start justify-between">
                 <div class="flex-1">
                   <div class="flex items-center gap-2 mb-2">
-                    <Receipt class="w-5 h-5 text-emerald-600" />
+                    <Receipt class="w-5 h-5 text-primary-600" />
                     <h4 class="font-semibold text-gray-900">{{ payment.plans?.nombre || 'Plan no disponible' }}</h4>
                   </div>
                   <div class="grid grid-cols-2 gap-2 text-sm">
@@ -86,7 +86,7 @@
                     </div>
                     <div>
                       <span class="text-gray-500">Monto:</span>
-                      <span class="ml-2 font-semibold text-emerald-600">{{ formatCurrency(payment.monto) }}</span>
+                      <span class="ml-2 font-semibold text-primary-600">{{ formatCurrency(payment.monto) }}</span>
                     </div>
                   </div>
                 </div>

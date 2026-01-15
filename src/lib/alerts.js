@@ -4,7 +4,7 @@ import Swal from 'sweetalert2'
  * Configuración global de SweetAlert2 con estilos Tailwind
  */
 const swalConfig = {
-  confirmButtonColor: '#059669', // emerald-600
+  confirmButtonColor: '#2563eb', // primary-600
   cancelButtonColor: '#e5e7eb', // gray-200
   cancelButtonText: 'Cancelar',
   confirmButtonText: 'Confirmar',
@@ -12,7 +12,7 @@ const swalConfig = {
     popup: 'rounded-xl shadow-2xl',
     title: 'text-xl font-bold text-gray-900',
     htmlContainer: 'text-gray-600',
-    confirmButton: 'bg-emerald-600 hover:bg-emerald-700 px-6 py-2.5 rounded-lg font-medium text-white shadow-sm hover:shadow-md transition-all',
+    confirmButton: 'bg-primary-600 hover:bg-primary-700 px-6 py-2.5 rounded-lg font-medium text-white shadow-sm hover:shadow-md transition-all',
     cancelButton: 'bg-gray-100 hover:bg-gray-200 px-6 py-2.5 rounded-lg font-medium text-gray-700 border border-gray-300 transition-all mr-2',
     actions: 'gap-3'
   },

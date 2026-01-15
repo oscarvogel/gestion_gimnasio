@@ -6,7 +6,7 @@
         <div class="w-20 text-sm text-gray-600">{{ day.day }}</div>
         <div class="flex-1 bg-gray-100 rounded-full h-8 relative">
           <div 
-            class="bg-emerald-500 h-full rounded-full flex items-center justify-end pr-2"
+            class="bg-primary-500 h-full rounded-full flex items-center justify-end pr-2"
             :style="{ width: `${(day.count / maxCount) * 100}%` }"
           >
             <span class="text-white text-xs font-medium">{{ day.count }}</span>

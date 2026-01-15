@@ -23,14 +23,14 @@
       <div 
         :class="[
           'p-3 rounded-lg',
-          iconBgColor || 'bg-emerald-50'
+          iconBgColor || 'bg-primary-50'
         ]"
       >
         <component 
           :is="icon" 
           :class="[
             'w-6 h-6',
-            iconColor || 'text-emerald-600'
+            iconColor || 'text-primary-600'
           ]"
         />
       </div>
@@ -65,11 +65,11 @@ const props = defineProps({
   },
   iconBgColor: {
     type: String,
-    default: 'bg-emerald-50'
+    default: 'bg-primary-50'
   },
   iconColor: {
     type: String,
-    default: 'text-emerald-600'
+    default: 'text-primary-600'
   }
 })
 

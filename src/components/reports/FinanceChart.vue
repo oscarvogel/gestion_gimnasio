@@ -3,7 +3,7 @@
     <!-- Loading State -->
     <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75">
       <div class="text-center">
-        <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-emerald-500 border-r-transparent"></div>
+        <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-500 border-r-transparent"></div>
         <p class="mt-2 text-sm text-gray-600">Cargando datos...</p>
       </div>
     </div>

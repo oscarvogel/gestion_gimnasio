@@ -20,7 +20,7 @@
             <p class="text-sm text-gray-600">Evolución de Ingresos vs Egresos</p>
           </div>
           <div v-if="loading.finance" class="flex items-center gap-2 text-sm text-gray-500">
-            <div class="h-4 w-4 animate-spin rounded-full border-2 border-solid border-emerald-500 border-r-transparent"></div>
+            <div class="h-4 w-4 animate-spin rounded-full border-2 border-solid border-primary-500 border-r-transparent"></div>
             Cargando...
           </div>
         </div>
@@ -44,7 +44,7 @@
             <div class="flex items-center justify-between mb-4">
               <h3 class="text-lg font-medium text-gray-800">Actividad por Día de la Semana</h3>
               <div v-if="loading.daily" class="flex items-center gap-2 text-xs text-gray-500">
-                <div class="h-3 w-3 animate-spin rounded-full border-2 border-solid border-emerald-500 border-r-transparent"></div>
+                <div class="h-3 w-3 animate-spin rounded-full border-2 border-solid border-primary-500 border-r-transparent"></div>
                 Cargando...
               </div>
             </div>
@@ -58,7 +58,7 @@
             <div class="flex items-center justify-between mb-4">
               <h3 class="text-lg font-medium text-gray-800">Horarios Pico</h3>
               <div v-if="loading.hourly" class="flex items-center gap-2 text-xs text-gray-500">
-                <div class="h-3 w-3 animate-spin rounded-full border-2 border-solid border-emerald-500 border-r-transparent"></div>
+                <div class="h-3 w-3 animate-spin rounded-full border-2 border-solid border-primary-500 border-r-transparent"></div>
                 Cargando...
               </div>
             </div>

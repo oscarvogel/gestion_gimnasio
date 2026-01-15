@@ -43,7 +43,7 @@
                       <img
                         :src="photoPreview"
                         alt="Preview"
-                        class="w-32 h-32 rounded-full object-cover border-4 border-emerald-100"
+                        class="w-32 h-32 rounded-full object-cover border-4 border-primary-100"
                       />
                       <button
                         v-if="!uploadingPhoto"
@@ -224,7 +224,7 @@
                     <input
                       type="checkbox"
                       v-model="formData.es_socio_club"
-                      class="w-5 h-5 text-emerald-600 rounded focus:ring-emerald-500"
+                      class="w-5 h-5 text-primary-600 rounded focus:ring-primary-500"
                     />
                     <span>¿Es Socio del Club?</span>
                     <span class="text-yellow-600">⭐</span>
@@ -242,7 +242,7 @@
                 </label>
                 <select
                   v-model="formData.plan_id"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 >
                   <option :value="null">Sin plan fijo (elegir al pagar)</option>
                   <option

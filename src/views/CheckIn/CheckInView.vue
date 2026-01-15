@@ -20,7 +20,7 @@
             v-model="searchQuery"
             type="text"
             placeholder="Ingresa DNI, nombre o apellido..."
-            class="w-full text-2xl p-6 rounded-2xl border-2 border-gray-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 focus:outline-none shadow-lg transition-all"
+            class="w-full text-2xl p-6 rounded-2xl border-2 border-gray-300 focus:border-primary-500 focus:ring-4 focus:ring-primary-100 focus:outline-none shadow-lg transition-all"
             @input="searchMembers"
             autofocus
           />
@@ -28,7 +28,7 @@
 
         <!-- Loading -->
         <div v-if="loading" class="text-center">
-          <div class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-emerald-500 border-r-transparent"></div>
+          <div class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-primary-500 border-r-transparent"></div>
           <p class="text-gray-600 mt-4 text-lg">Buscando...</p>
         </div>
 
@@ -124,7 +124,7 @@
       <aside class="lg:w-80 bg-white lg:border-l border-gray-200 lg:overflow-y-auto">
         <div class="sticky top-0 bg-white border-b border-gray-100 p-6 z-10">
           <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            <Activity class="h-5 w-5 text-emerald-600" />
+            <Activity class="h-5 w-5 text-primary-600" />
             Últimos Accesos
           </h2>
           <p class="text-xs text-gray-500 mt-1">Live Feed</p>

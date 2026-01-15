@@ -23,7 +23,7 @@
                 v-model="memberSearch"
                 type="text"
                 placeholder="Nombre, apellido o DNI..."
-                class="block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                class="block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 @input="searchMembers"
               />
               
@@ -42,11 +42,11 @@
               </div>
 
               <!-- Socio seleccionado -->
-              <div v-if="selectedMember" class="mt-2 bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+              <div v-if="selectedMember" class="mt-2 bg-primary-50 border border-primary-200 rounded-lg p-3">
                 <div class="flex justify-between items-center">
                   <div>
-                    <p class="font-medium text-emerald-900">{{ selectedMember.nombre }} {{ selectedMember.apellido }}</p>
-                    <p class="text-sm text-emerald-700">DNI: {{ selectedMember.dni }}</p>
+                    <p class="font-medium text-primary-900">{{ selectedMember.nombre }} {{ selectedMember.apellido }}</p>
+                    <p class="text-sm text-primary-700">DNI: {{ selectedMember.dni }}</p>
                   </div>
                   <button
                     type="button"
@@ -66,7 +66,7 @@
               </label>
               <select
                 v-model="formData.plan_id"
-                class="block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                class="block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 required
                 @change="updateDates"
               >
@@ -84,7 +84,7 @@
               </label>
               <select
                 v-model="formData.metodo_pago"
-                class="block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                class="block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 required
               >
                 <option value="" disabled>Seleccionar método...</option>
@@ -102,7 +102,7 @@
               <input
                 v-model="formData.fecha_inicio"
                 type="date"
-                class="block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                class="block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 required
                 @change="updateDates"
               />
@@ -118,14 +118,14 @@
           </div>
 
           <!-- Columna Derecha: Resumen de Pago -->
-          <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl shadow-sm border border-emerald-100 p-6">
+          <div class="bg-gradient-to-br from-primary-50 to-blue-50 rounded-xl shadow-sm border border-primary-100 p-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-6">Resumen de Pago</h2>
             
             <div class="space-y-6">
               <!-- Monto a Pagar -->
               <div class="text-center py-6 bg-white rounded-lg shadow-sm">
                 <p class="text-sm text-gray-600 mb-2">Monto a Pagar</p>
-                <p class="text-5xl font-bold text-emerald-600">
+                <p class="text-5xl font-bold text-primary-600">
                   {{ formData.monto ? `$${formData.monto}` : '$0' }}
                 </p>
                 <!-- Badge de tarifa aplicada -->
@@ -159,7 +159,7 @@
                 </div>
                 <div v-if="durationDays" class="border-t border-gray-100 pt-3">
                   <p class="text-xs text-gray-500 uppercase font-semibold mb-1">Duración</p>
-                  <p class="text-base font-medium text-emerald-600">
+                  <p class="text-base font-medium text-primary-600">
                     {{ durationDays }} días
                   </p>
                 </div>
@@ -181,7 +181,7 @@
           <button
             type="submit"
             :disabled="!selectedMember || loading"
-            class="flex-1 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+            class="flex-1 bg-primary-600 hover:bg-primary-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-colors"
           >
             {{ loading ? 'Procesando...' : 'Registrar Pago' }}
           </button>

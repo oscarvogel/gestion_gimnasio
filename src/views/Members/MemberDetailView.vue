@@ -21,7 +21,7 @@
       <!-- Contenido -->
       <div v-else-if="memberData" class="space-y-6">
         <!-- Encabezado con Foto y Datos Principales -->
-        <div class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl shadow-lg p-6 text-white">
+        <div class="bg-gradient-to-r from-primary-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
           <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
             <!-- Foto del Socio -->
             <div class="flex-shrink-0">
@@ -73,7 +73,7 @@
             <div class="flex-shrink-0">
               <button
                 @click="goToEdit"
-                class="px-6 py-2 bg-white text-emerald-600 hover:bg-emerald-50 font-semibold rounded-lg shadow-md transition-colors border-2 border-white"
+                class="px-6 py-2 bg-white text-primary-600 hover:bg-primary-50 font-semibold rounded-lg shadow-md transition-colors border-2 border-white"
               >
                 Editar Perfil
               </button>

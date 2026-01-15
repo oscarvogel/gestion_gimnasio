@@ -12,7 +12,7 @@
         <!-- Loading State -->
         <div v-if="loading" class="flex items-center justify-center py-12">
           <div class="text-center">
-            <div class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-emerald-500 border-r-transparent mb-4"></div>
+            <div class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-primary-500 border-r-transparent mb-4"></div>
             <p class="text-gray-600">Cargando configuración...</p>
           </div>
         </div>
@@ -63,7 +63,7 @@
                 >
               </label>
               <span v-if="uploadingLogo" class="text-sm text-gray-600 flex items-center gap-2">
-                <div class="h-4 w-4 animate-spin rounded-full border-2 border-solid border-emerald-500 border-r-transparent"></div>
+                <div class="h-4 w-4 animate-spin rounded-full border-2 border-solid border-primary-500 border-r-transparent"></div>
                 Subiendo...
               </span>
             </div>
@@ -124,7 +124,7 @@
               v-model="formData.horarios_apertura"
               rows="4"
               placeholder="Ej:&#10;Lunes a Viernes: 6:00 - 22:00&#10;Sábados: 8:00 - 20:00&#10;Domingos: 9:00 - 14:00"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all resize-none"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all resize-none"
               maxlength="500"
             ></textarea>
             <p class="text-xs text-gray-500 mt-1">

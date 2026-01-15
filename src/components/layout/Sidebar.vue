@@ -24,7 +24,7 @@
               :to="item.to"
               :class="[
                 isActive(item.to) 
-                  ? 'bg-emerald-50 text-emerald-600 border-l-4 border-emerald-500' 
+                  ? 'bg-primary-50 text-primary-600 border-l-4 border-primary-500' 
                   : 'text-gray-300 hover:bg-gray-700 hover:text-white border-l-4 border-transparent',
                 'group flex items-center px-4 py-3 text-sm font-medium rounded-r-md transition-all duration-200'
               ]"

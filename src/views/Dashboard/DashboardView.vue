@@ -67,8 +67,8 @@
             :value="'$' + formatCurrency(stats.monthlyRevenue)"
             trend="+12%"
             :icon="Wallet"
-            icon-bg-color="bg-emerald-50"
-            icon-color="text-emerald-600"
+            icon-bg-color="bg-primary-50"
+            icon-color="text-primary-600"
           />
           
           <StatCard

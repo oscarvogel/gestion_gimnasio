@@ -39,11 +39,11 @@
                 v-model="searchQuery"
                 type="text"
                 placeholder="Buscar por nombre, apellido o DNI..."
-                class="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
+                class="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
               />
               <button
                 @click="goToNewMember"
-                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition-colors text-sm whitespace-nowrap"
+                class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition-colors text-sm whitespace-nowrap"
               >
                 + Nuevo Socio
               </button>
@@ -105,7 +105,7 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="cursor-pointer" @click="goToMemberDetail(member.id)">
-                    <div class="text-sm font-medium text-gray-900 hover:text-emerald-600 flex items-center gap-2">
+                    <div class="text-sm font-medium text-gray-900 hover:text-primary-600 flex items-center gap-2">
                       {{ member.nombre }} {{ member.apellido }}
                       <span v-if="member.es_socio_club" class="text-yellow-500" title="Socio Club">⭐</span>
                     </div>
@@ -135,10 +135,10 @@
                   <div class="flex items-center justify-center gap-2">
                     <button
                       @click.stop="openHistoryModal(member, 'payments')"
-                      class="p-2 hover:bg-emerald-50 rounded-lg transition-colors group"
+                      class="p-2 hover:bg-primary-50 rounded-lg transition-colors group"
                       title="Ver Pagos"
                     >
-                      <Receipt class="w-5 h-5 text-gray-400 group-hover:text-emerald-600" />
+                      <Receipt class="w-5 h-5 text-gray-400 group-hover:text-primary-600" />
                     </button>
                     <button
                       @click.stop="openHistoryModal(member, 'attendance')"
@@ -204,9 +204,9 @@
               <div class="flex gap-2">
                 <button
                   @click.stop="openHistoryModal(member, 'payments')"
-                  class="p-2 hover:bg-emerald-50 rounded-lg transition-colors"
+                  class="p-2 hover:bg-primary-50 rounded-lg transition-colors"
                 >
-                  <Receipt class="w-5 h-5 text-emerald-600" />
+                  <Receipt class="w-5 h-5 text-primary-600" />
                 </button>
                 <button
                   @click.stop="openHistoryModal(member, 'attendance')"

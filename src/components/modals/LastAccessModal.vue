@@ -4,7 +4,7 @@
       <!-- Header -->
       <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
         <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-          <ListChecks class="w-6 h-6 text-emerald-600" />
+          <ListChecks class="w-6 h-6 text-primary-600" />
           Últimos Accesos al Gimnasio
         </h3>
         <button
@@ -19,7 +19,7 @@
       <div class="p-6 overflow-y-auto max-h-[calc(80vh-80px)]">
         <!-- Loading -->
         <div v-if="loading" class="text-center py-8">
-          <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-300 border-t-emerald-600"></div>
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-300 border-t-primary-600"></div>
           <p class="mt-4 text-gray-500">Cargando accesos...</p>
         </div>
 
@@ -43,8 +43,8 @@
               <tr v-for="access in accesses" :key="access.id" class="hover:bg-gray-50">
                 <td class="px-4 py-3">
                   <div class="flex items-center gap-3">
-                    <div class="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center">
-                      <span class="text-sm font-semibold text-emerald-700">
+                    <div class="h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center">
+                      <span class="text-sm font-semibold text-primary-700">
                         {{ getInitials(access.members?.nombre, access.members?.apellido) }}
                       </span>
                     </div>

@@ -3,7 +3,7 @@
     <!-- Mostrar loading mientras se inicializa la sesión -->
     <div v-if="userStore.loading" class="min-h-screen flex items-center justify-center bg-gray-50">
       <div class="text-center">
-        <div class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-emerald-500 border-r-transparent mb-4"></div>
+        <div class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-primary-500 border-r-transparent mb-4"></div>
         <p class="text-gray-600">Cargando...</p>
       </div>
     </div>

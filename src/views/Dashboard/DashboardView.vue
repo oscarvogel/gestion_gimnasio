@@ -14,43 +14,51 @@
           </span>
         </p>
 
-        <!-- Botones de Acceso Rápido -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <BaseButton
-            variant="primary"
+        <!-- Action Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <button
             @click="router.push({ name: 'NewMember' })"
-            class="flex items-center justify-center gap-2 py-3"
+            class="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-primary-100 transition-all duration-200 group text-center"
           >
-            <UserPlus class="w-5 h-5" />
-            Nuevo Socio
-          </BaseButton>
+            <div class="p-3 bg-primary-50 text-primary-600 rounded-full mb-3 group-hover:scale-110 transition-transform duration-200">
+              <UserPlus class="w-6 h-6" />
+            </div>
+            <span class="font-semibold text-gray-900 group-hover:text-primary-700 transition-colors">Nuevo Socio</span>
+            <span class="text-xs text-gray-400 mt-1">Registrar nueva alta</span>
+          </button>
 
-          <BaseButton
-            variant="primary"
+          <button
             @click="router.push({ name: 'NewPayment' })"
-            class="flex items-center justify-center gap-2 py-3"
+            class="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-emerald-100 transition-all duration-200 group text-center"
           >
-            <BadgeDollarSign class="w-5 h-5" />
-            Registrar Pago
-          </BaseButton>
+            <div class="p-3 bg-emerald-50 text-emerald-600 rounded-full mb-3 group-hover:scale-110 transition-transform duration-200">
+              <BadgeDollarSign class="w-6 h-6" />
+            </div>
+            <span class="font-semibold text-gray-900 group-hover:text-emerald-700 transition-colors">Registrar Pago</span>
+            <span class="text-xs text-gray-400 mt-1">Ingresar cuota</span>
+          </button>
 
-          <BaseButton
-            variant="primary"
+          <button
             @click="router.push({ name: 'CheckIn' })"
-            class="flex items-center justify-center gap-2 py-3"
+            class="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-purple-100 transition-all duration-200 group text-center"
           >
-            <CheckCircle class="w-5 h-5" />
-            Check-In
-          </BaseButton>
+            <div class="p-3 bg-purple-50 text-purple-600 rounded-full mb-3 group-hover:scale-110 transition-transform duration-200">
+              <CheckCircle class="w-6 h-6" />
+            </div>
+            <span class="font-semibold text-gray-900 group-hover:text-purple-700 transition-colors">Check-In</span>
+            <span class="text-xs text-gray-400 mt-1">Control de acceso</span>
+          </button>
 
-          <BaseButton
-            variant="secondary"
+          <button
             @click="showLastAccessModal = true"
-            class="flex items-center justify-center gap-2 py-3"
+            class="flex flex-col items-center justify-center p-6 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-100 transition-all duration-200 group text-center"
           >
-            <ListChecks class="w-5 h-5" />
-            Ver Últimos Accesos
-          </BaseButton>
+            <div class="p-3 bg-blue-50 text-blue-600 rounded-full mb-3 group-hover:scale-110 transition-transform duration-200">
+              <ListChecks class="w-6 h-6" />
+            </div>
+            <span class="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">Últimos Accesos</span>
+            <span class="text-xs text-gray-400 mt-1">Historial reciente</span>
+          </button>
         </div>
       </div>
 
@@ -129,7 +137,7 @@
         </div>
 
         <!-- Últimos Check-Ins -->
-        <div class="bg-white rounded-xl shadow-sm p-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <div class="flex items-center justify-between mb-6">
             <h2 class="text-xl font-bold text-gray-800">Últimos Check-Ins</h2>
             <BaseButton

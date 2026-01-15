@@ -1,7 +1,7 @@
 <template>
   <div 
     @click="handleClick"
-    class="bg-white rounded-xl shadow-sm p-6 cursor-pointer transition-all duration-200 hover:shadow-md"
+    class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 cursor-pointer transition-all duration-200 hover:shadow-md hover:border-primary-100"
   >
     <div class="flex items-start justify-between">
       <div class="flex-1">

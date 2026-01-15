@@ -1,55 +1,66 @@
 <template>
-  <aside class="hidden md:flex md:flex-shrink-0">
-    <div class="flex flex-col w-64">
-      <div class="flex flex-col h-0 flex-1 bg-gray-800">
+  <aside class="hidden md:flex md:flex-shrink-0 z-30">
+    <div class="flex flex-col w-64 bg-white border-r border-gray-200">
+      <div class="flex flex-col h-0 flex-1">
         <!-- Logo/Header -->
-        <div class="flex items-center justify-center h-16 flex-shrink-0 px-4 bg-gray-900">
+        <div class="flex items-center h-16 flex-shrink-0 px-6 bg-white border-b border-gray-100">
           <img 
             v-if="settings.logo_url" 
             :src="settings.logo_url" 
             :alt="settings.nombre_gimnasio"
-            class="h-10 max-w-full object-contain"
+            class="h-8 w-auto object-contain"
           >
-          <h1 v-else class="text-white text-xl font-bold">
+          <span v-else class="text-gray-900 text-lg font-bold tracking-tight">
             {{ settings.nombre_gimnasio }}
-          </h1>
+          </span>
         </div>
 
         <!-- Navigation -->
-        <div class="flex-1 flex flex-col overflow-y-auto">
-          <nav class="flex-1 px-2 py-4 space-y-2">
-            <router-link
-              v-for="item in navigation"
-              :key="item.name"
-              :to="item.to"
-              :class="[
-                isActive(item.to) 
-                  ? 'bg-primary-50 text-primary-600 border-l-4 border-primary-500' 
-                  : 'text-gray-300 hover:bg-gray-700 hover:text-white border-l-4 border-transparent',
-                'group flex items-center px-4 py-3 text-sm font-medium rounded-r-md transition-all duration-200'
-              ]"
-            >
-              <component :is="item.icon" class="w-5 h-5 mr-3" />
-              {{ item.name }}
-            </router-link>
+        <div class="flex-1 flex flex-col overflow-y-auto px-3 py-4">
+          <nav class="flex-1 space-y-1">
+            <template v-for="item in navigation" :key="item.name">
+              <router-link
+                :to="item.to"
+                :class="[
+                  isActive(item.to) 
+                    ? 'bg-primary-50 text-primary-600' 
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                  'group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-150 ease-in-out'
+                ]"
+              >
+                <component 
+                  :is="item.icon" 
+                  :class="[
+                    isActive(item.to) ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-500',
+                    'flex-shrink-0 w-5 h-5 mr-3 transition-colors duration-150'
+                  ]" 
+                />
+                {{ item.name }}
+              </router-link>
+            </template>
           </nav>
         </div>
 
         <!-- User section -->
-        <div class="flex-shrink-0 flex bg-gray-700 p-4">
-          <div class="flex items-center w-full">
-            <div class="flex-1">
-              <p class="text-sm font-medium text-white">{{ userStore.userEmail }}</p>
-              <p class="text-xs text-gray-300">
-                {{ userStore.isAdmin ? 'Admin' : 'Staff' }}
+        <div class="flex-shrink-0 border-t border-gray-100 p-4">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="h-9 w-9 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-semibold text-sm">
+                {{ userStore.userEmail.charAt(0).toUpperCase() }}
+              </div>
+            </div>
+            <div class="ml-3 min-w-0 flex-1">
+              <p class="text-sm font-medium text-gray-700 truncate">{{ userStore.userEmail }}</p>
+              <p class="text-xs font-medium text-gray-500 truncate">
+                {{ userStore.isAdmin ? 'Administrador' : 'Staff' }}
               </p>
             </div>
             <button
               @click="handleLogout"
-              class="ml-2 p-2 text-gray-300 hover:text-white hover:bg-gray-600 rounded-md transition-colors"
+              class="ml-2 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
               title="Cerrar sesión"
             >
-              <LogOut class="w-5 h-5" />
+              <LogOut class="w-4 h-4" />
             </button>
           </div>
         </div>
